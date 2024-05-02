@@ -20,13 +20,13 @@ public class NameParser implements Parsable {
 
     @Override
     public StructuredName parse(String input) {
-        String firstName = null;
-        String lastName = null;
+        String firstName = "";
+        String lastName = "";
 
         if(input.contains(","))
         {
-            //handle comma separated names
-            return new StructuredName(null, null, null, null, null);
+            firstName = input.split(",")[1].trim();
+            input = input.split(",")[0].trim();
         }
 
         var genderParseResult = parseGender(input);
@@ -44,8 +44,8 @@ public class NameParser implements Parsable {
 
         if(input.contains(" ")) {
             String[] names = input.split(" ");
-            firstName = names[0];
-            lastName = String.join(" ", Arrays.copyOfRange(names, 1, names.length));
+            firstName = firstName.concat(names[0]).trim();
+            lastName = String.join(" ", Arrays.copyOfRange(names, 1, names.length)).trim();
         }
         else{
             if(!input.isBlank() && !input.isEmpty()){
