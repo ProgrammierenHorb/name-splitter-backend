@@ -1,5 +1,6 @@
 package com.example.namesplitter.parser;
 
+import com.example.namesplitter.model.Gender;
 import com.example.namesplitter.model.StructuredName;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -113,6 +114,24 @@ class NameParserTest {
     @Test
     void nullInput() {
         assertThrows(NullPointerException.class, () -> nameParser.parse(null));
+    }
+
+    @Test
+    void doubleFirstAndLastName(){
+        StructuredName expected = new StructuredName(null, new ArrayList<>(List.of("Dr. phil.")), "Marie-Agnes", "Strack-Zimmermann", null);
+        assertEquals(expected, nameParser.parse("Dr. phil. Marie-Agnes Strack-Zimmermann"));
+    }
+
+    @Test
+    void vonUndZuGutenberg(){
+        StructuredName expected = new StructuredName(Gender.MALE, new ArrayList<>(List.of("Dr.")), "Karl-Theodor Maria Nikolaus Johann Jacob Philipp Franz Joseph Sylvester", "Buhl-Freiherr von und zu Guttenberg", null);
+        assertEquals(expected, nameParser.parse("Herr Doktor Karl-Theodor Maria Nikolaus Johann Jacob Philipp Franz Joseph Sylvester Buhl-Freiherr von und zu Guttenberg"));
+    }
+
+    @Test
+    void middleName(){
+        StructuredName expected = new StructuredName(Gender.MALE, new ArrayList<>(), "Markus Paul Wolfgang", "Blattau", null);
+        assertEquals(expected, nameParser.parse(""));
     }
 
 }
