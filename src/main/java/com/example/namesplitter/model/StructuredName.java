@@ -1,4 +1,6 @@
 package com.example.namesplitter.model;
 
-public record StructuredName(Gender gender, String title, String firstName, String lastName, String standardizedSalutation){
+import java.util.List;
+
+public record StructuredName(Gender gender, List<String> title, String firstName, String lastName, String standardizedSalutation){
 }
