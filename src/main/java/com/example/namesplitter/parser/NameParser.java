@@ -2,10 +2,7 @@ package com.example.namesplitter.parser;
 
 import com.example.namesplitter.model.Gender;
 import com.example.namesplitter.model.StructuredName;
-import com.example.namesplitter.storage.InMemorySalutationService;
-import com.example.namesplitter.storage.InMemoryTitleStorage;
-import com.example.namesplitter.storage.SalutationStorageService;
-import com.example.namesplitter.storage.TitleStorageService;
+import com.example.namesplitter.storage.*;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -17,6 +14,7 @@ public class NameParser implements Parsable {
 
     private final TitleStorageService titleStorage = new InMemoryTitleStorage();
     private final SalutationStorageService salutationStorage = new InMemorySalutationService();
+    private final NameGenderService nameGenderService = new SQLiteNameGenderService();
 
     @Override
     public StructuredName parse(String input) {
@@ -51,6 +49,11 @@ public class NameParser implements Parsable {
             if(!input.isBlank() && !input.isEmpty()){
                 lastName = input;
             }
+        }
+
+        if(gender == null){
+            Gender potentialGender = nameGenderService.getGender(firstName);
+            if(potentialGender != null) gender = potentialGender;
         }
 
         return new StructuredName(gender, titles, firstName, lastName, null);

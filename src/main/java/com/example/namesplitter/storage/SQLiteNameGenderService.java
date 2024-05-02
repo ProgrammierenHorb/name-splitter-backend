@@ -1,6 +1,6 @@
 package com.example.namesplitter.storage;
 
-import com.example.namesplitter.storage.NameGenderService;
+import com.example.namesplitter.model.Gender;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -13,7 +13,7 @@ public class SQLiteNameGenderService implements NameGenderService {
     private static final String DB_URL = "jdbc:sqlite::resource:names.db";
 
     @Override
-    public String getGender(String name) {
+    public Gender getGender(String name) {
         loadSQLiteJDBCDriver();
         try (Connection conn = DriverManager.getConnection(DB_URL);
              Statement stmt = conn.createStatement()) {
@@ -22,7 +22,7 @@ public class SQLiteNameGenderService implements NameGenderService {
             ResultSet rs = stmt.executeQuery(query);
 
             if (rs.next()) {
-                return rs.getString("Gender");
+                return rs.getString("Gender").equals("M") ? Gender.MALE : Gender.FEMALE;
             }
         } catch (SQLException e) {
             e.printStackTrace();

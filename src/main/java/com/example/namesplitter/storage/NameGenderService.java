@@ -1,6 +1,8 @@
 package com.example.namesplitter.storage;
 
+import com.example.namesplitter.model.Gender;
+
 public interface NameGenderService {
 
-        public String getGender(String name);
+        public Gender getGender(String name);
 }
