@@ -13,7 +13,9 @@ public class InMemorySalutationService implements SalutationStorageService {
     public Map<String, Gender> getAllSalutations() {
         return new HashMap<>(Map.of(
                 "Herr", Gender.MALE,
-                "Frau", Gender.FEMALE
+                "Frau", Gender.FEMALE,
+                "Mme.", Gender. FEMALE,
+                "Mrs.", Gender.FEMALE
         ));
     }
 }
