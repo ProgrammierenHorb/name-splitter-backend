@@ -1,6 +1,6 @@
 package com.example.namesplitter.api;
 
-import com.example.namesplitter.model.structuredName;
+import com.example.namesplitter.model.StructuredName;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,5 +9,5 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public interface APIService {
 
     @GetMapping("/parse/{name}")
-    public structuredName parse(@PathVariable String name);
+    public StructuredName parse(@PathVariable String name);
 }
