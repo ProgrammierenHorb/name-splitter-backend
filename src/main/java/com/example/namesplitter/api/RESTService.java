@@ -26,4 +26,14 @@ public class RESTService implements APIService{
     public List<String> getTitles() {
         return new InMemoryTitleStorage().getAllTitles().values().stream().toList();
     }
+
+    @Override
+    public void addTitle(String title) {
+
+    }
+
+    @Override
+    public void save(StructuredName name) {
+
+    }
 }
