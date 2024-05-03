@@ -1,7 +1,8 @@
 package com.example.namesplitter.storage;
 
+import com.example.namesplitter.storage.interfaces.TitleStorageService;
+
 import java.util.*;
-import java.util.regex.Pattern;
 
 public class InMemoryTitleStorage implements TitleStorageService {
 

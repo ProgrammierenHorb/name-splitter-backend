@@ -1,6 +1,7 @@
 package com.example.namesplitter.storage;
 
 import com.example.namesplitter.model.Gender;
+import com.example.namesplitter.storage.interfaces.NameGenderService;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

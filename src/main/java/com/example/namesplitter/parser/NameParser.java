@@ -3,6 +3,10 @@ package com.example.namesplitter.parser;
 import com.example.namesplitter.model.Gender;
 import com.example.namesplitter.model.StructuredName;
 import com.example.namesplitter.storage.*;
+import com.example.namesplitter.storage.interfaces.NameGenderService;
+import com.example.namesplitter.storage.interfaces.PatronymicsService;
+import com.example.namesplitter.storage.interfaces.SalutationStorageService;
+import com.example.namesplitter.storage.interfaces.TitleStorageService;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -15,17 +19,12 @@ public class NameParser implements Parsable {
     private final TitleStorageService titleStorage = new InMemoryTitleStorage();
     private final SalutationStorageService salutationStorage = new InMemorySalutationService();
     private final NameGenderService nameGenderService = new SQLiteNameGenderService();
+    private final PatronymicsService patronymicsService = new InMemoryPatronymicsStorage();
 
     @Override
     public StructuredName parse(String input) {
         String firstName = "";
         String lastName = "";
-
-        if(input.contains(","))
-        {
-            firstName = input.split(",")[1].trim();
-            input = input.split(",")[0].trim();
-        }
 
         var genderParseResult = parseGender(input);
 
@@ -40,20 +39,18 @@ public class NameParser implements Parsable {
             input = title.getRight().trim();
         }
 
-        if(input.contains(" ")) {
-            String[] names = input.split(" ");
-            firstName = firstName.concat(names[0]).trim();
-            lastName = String.join(" ", Arrays.copyOfRange(names, 1, names.length)).trim();
-        }
-        else{
-            if(!input.isBlank() && !input.isEmpty()){
-                lastName = input;
-            }
-        }
+        Pair<String, String> name = parseName(input);
 
-        if(gender == null){
-            Gender potentialGender = nameGenderService.getGender(firstName);
-            if(potentialGender != null) gender = potentialGender;
+        firstName = name.getLeft();
+        lastName = name.getRight();
+
+        //if no gender is found yet, try guessing with first name from name database
+        if(gender == null && firstName != null){
+            firstName = firstName.trim();
+            Gender potentialGender = nameGenderService.getGender(firstName.split(" ")[0]);
+            if(potentialGender != null){
+                gender = potentialGender;
+            }
         }
 
         return new StructuredName(gender, titles, firstName, lastName, null);
@@ -91,5 +88,43 @@ public class NameParser implements Parsable {
             }
         }
         return new ImmutablePair<>(null, input);
+    }
+
+    private Pair<String, String> parseName(String input){
+
+        input = input.trim();
+
+        //if input is empty, return null
+        if(input.isEmpty()){
+            return new ImmutablePair<>(null, null);
+        }
+
+        if(input.contains(",")){
+            String[] parts = input.split(",");
+            return new ImmutablePair<>(parts[1].trim(), parts[0].trim());
+        }
+
+        List<String> patronymics = patronymicsService.getAllPatronymics();
+
+        int lastNameStartIndex = -1;
+
+        String[] parts = input.split(" ");
+        if(parts.length == 1) return new ImmutablePair<>(null, input);
+
+        for(int i = 0; i < parts.length; i++){
+            parts[i] = parts[i].trim();
+            if(patronymics.contains(parts[i])){
+                lastNameStartIndex = i;
+                break;
+            }
+        }
+
+        if(lastNameStartIndex == -1){
+            return new ImmutablePair<>(String.join(" ", Arrays.stream(parts).toList().subList(0, parts.length -1)), parts[parts.length - 1]);
+        }
+        else{
+            return new ImmutablePair<>(String.join(" ", Arrays.stream(parts).toList().subList(0, lastNameStartIndex)), String.join(" ", Arrays.stream(parts).toList().subList(lastNameStartIndex, parts.length)));
+        }
+
     }
 }

@@ -1,4 +1,4 @@
-package com.example.namesplitter.storage;
+package com.example.namesplitter.storage.interfaces;
 
 import com.example.namesplitter.model.Gender;
 

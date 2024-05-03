@@ -1,6 +1,5 @@
-package com.example.namesplitter.storage;
+package com.example.namesplitter.storage.interfaces;
 
-import java.util.List;
 import java.util.Map;
 
 public interface TitleStorageService {

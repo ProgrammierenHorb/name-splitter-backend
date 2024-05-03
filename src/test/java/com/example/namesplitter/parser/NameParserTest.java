@@ -5,7 +5,6 @@ import com.example.namesplitter.model.StructuredName;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +22,7 @@ class NameParserTest {
 
     @Test
     void onlyLastName(){
-        StructuredName expected = new StructuredName(null, new ArrayList<>(), "", "Doe", null);
+        StructuredName expected = new StructuredName(null, new ArrayList<>(), null, "Doe", null);
         assertEquals(expected, nameParser.parse("Doe"));
     }
 
@@ -41,7 +40,7 @@ class NameParserTest {
 
     @Test
     void doctorAndLastName(){
-        StructuredName expected = new StructuredName(null, new ArrayList<>(List.of("Dr.")), "", "Doe", null);
+        StructuredName expected = new StructuredName(null, new ArrayList<>(List.of("Dr.")), null, "Doe", null);
         assertEquals(expected, nameParser.parse("Dr. Doe"));
     }
 
@@ -65,13 +64,13 @@ class NameParserTest {
 
     @Test
     void titleAndLastName() {
-        StructuredName expected = new StructuredName(null, new ArrayList<>(List.of("Dr. rer. nat.")), "", "Doe", null);
+        StructuredName expected = new StructuredName(null, new ArrayList<>(List.of("Dr. rer. nat.")), null, "Doe", null);
         assertEquals(expected, nameParser.parse("Dr. rer. nat. Doe"));
     }
 
     @Test
     void multipleTitlesAndLastName() {
-        StructuredName expected = new StructuredName(null, new ArrayList<>(List.of("Prof.", "Dr.")), "", "Doe", null);
+        StructuredName expected = new StructuredName(null, new ArrayList<>(List.of("Prof.", "Dr.")), null, "Doe", null);
         assertEquals(expected, nameParser.parse("Prof. Dr. Doe"));
     }
 
@@ -83,22 +82,22 @@ class NameParserTest {
 
     @Test
     void titleWithSpecialCharactersAndLastName() {
-        StructuredName expected = new StructuredName(null, new ArrayList<>(List.of("Dr.-Ing.")), "", "Doe", null);
+        StructuredName expected = new StructuredName(null, new ArrayList<>(List.of("Dr.-Ing.")), null, "Doe", null);
         assertEquals(expected, nameParser.parse("Dr.-Ing. Doe"));
     }
 
     @Test
     void titleAndDoubleLastName() {
-        StructuredName expected = new StructuredName(null, new ArrayList<>(List.of("Dr.")), "", "Voss-Tecklenburg", null);
+        StructuredName expected = new StructuredName(null, new ArrayList<>(List.of("Dr.")), null, "Voss-Tecklenburg", null);
         assertEquals(expected, nameParser.parse("Dr. Voss-Tecklenburg"));
     }
 
     //TODO: Fix this test
-/*    @Test
+    @Test
     void titleAndLastNameWithComma() {
         StructuredName expected = new StructuredName(Gender.MALE, new ArrayList<>(List.of("Dr.")), "John", "Doe", null);
         assertEquals(expected, nameParser.parse("Doe, Dr. John"));
-    }*/
+    }
 
     @Test
     void titleAndDoubleLastNameWithComma() {
@@ -108,7 +107,7 @@ class NameParserTest {
 
     @Test
     void emptyInput() {
-        StructuredName expected = new StructuredName(null, new ArrayList<>(), "", "", null);
+        StructuredName expected = new StructuredName(null, new ArrayList<>(), null, null, null);
         assertEquals(expected, nameParser.parse(""));
     }
 
@@ -130,11 +129,10 @@ class NameParserTest {
         assertEquals(expected, nameParser.parse("Herr Doktor Karl-Theodor Maria Nikolaus Johann Jacob Philipp Franz Joseph Sylvester Buhl-Freiherr von und zu Guttenberg"));
     }*/
 
-    //TODO: Fix this test
-/*    @Test
+    @Test
     void middleName(){
         StructuredName expected = new StructuredName(Gender.MALE, new ArrayList<>(), "Markus Paul Wolfgang", "Blattau", null);
-        assertEquals(expected, nameParser.parse("Markus Paul Wolfgang"));
-    }*/
+        assertEquals(expected, nameParser.parse("Markus Paul Wolfgang Blattau"));
+    }
 
 }

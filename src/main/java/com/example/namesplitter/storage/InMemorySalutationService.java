@@ -1,10 +1,9 @@
 package com.example.namesplitter.storage;
 
 import com.example.namesplitter.model.Gender;
+import com.example.namesplitter.storage.interfaces.SalutationStorageService;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class InMemorySalutationService implements SalutationStorageService {
