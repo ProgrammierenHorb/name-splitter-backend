@@ -73,7 +73,7 @@ public class NameParser implements Parsable {
         }
 
         if (longestMatch != null) {
-            input = input.replace(longestMatch, "").trim();
+            input = input.replaceFirst(longestMatch, "").trim();
             return new ImmutablePair<>(longestTitle, input);
         }
 
