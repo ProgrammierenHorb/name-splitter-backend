@@ -61,7 +61,7 @@ public class NameParser implements Parsable {
         String longestTitle = null;
 
         for (var s : titleStorage.getAllTitles().entrySet()) {
-            Pattern pattern = Pattern.compile(s.getKey());
+            Pattern pattern = Pattern.compile(s.getKey(), Pattern.CASE_INSENSITIVE);
             Matcher matcher = pattern.matcher(input);
             if (matcher.find()) {
                 String match = matcher.group();
