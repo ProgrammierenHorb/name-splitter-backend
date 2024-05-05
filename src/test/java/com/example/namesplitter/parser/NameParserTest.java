@@ -64,8 +64,8 @@ class NameParserTest {
 
     @Test
     void titleAndLastName() {
-        StructuredName expected = new StructuredName(null, new ArrayList<>(List.of("Dr. rer. nat.")), null, "Doe", null);
-        assertEquals(expected, nameParser.parse("Dr. rer. nat. Doe"));
+        StructuredName expected = new StructuredName(null, new ArrayList<>(List.of("Dr.rer.nat.")), null, "Doe", null);
+        assertEquals(expected, nameParser.parse("Dr.rer.nat. Doe"));
     }
 
     @Test
@@ -118,8 +118,8 @@ class NameParserTest {
 
     @Test
     void doubleFirstAndLastName(){
-        StructuredName expected = new StructuredName(null, new ArrayList<>(List.of("Dr. phil.")), "Marie-Agnes", "Strack-Zimmermann", null);
-        assertEquals(expected, nameParser.parse("Dr. phil. Marie-Agnes Strack-Zimmermann"));
+        StructuredName expected = new StructuredName(null, new ArrayList<>(List.of("Dr.phil.")), "Marie-Agnes", "Strack-Zimmermann", null);
+        assertEquals(expected, nameParser.parse("Dr.phil. Marie-Agnes Strack-Zimmermann"));
     }
 
     //Note: Test is probably not decidable by a simple algorithm

@@ -1,18 +1,16 @@
 package com.example.namesplitter.api;
 
 import com.example.namesplitter.model.APIResponse;
-import com.example.namesplitter.model.Gender;
 import com.example.namesplitter.model.StructuredName;
 import com.example.namesplitter.model.Title;
 import com.example.namesplitter.parser.NameParser;
-import com.example.namesplitter.parser.Parsable;
+import com.example.namesplitter.parser.Parser;
 import com.example.namesplitter.storage.InMemoryTitleStorage;
 import com.example.namesplitter.storage.SQLiteNameGenderService;
 import com.example.namesplitter.storage.interfaces.TitleStorageService;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 public class RESTService implements APIService{
@@ -21,9 +19,10 @@ public class RESTService implements APIService{
 
     @Override
     public APIResponse parse(String name) {
-        Parsable parser = new NameParser();
+        Parser parser = new NameParser();
         System.out.println(new SQLiteNameGenderService().getGender(name));
-        return new APIResponse(false, "", parser.parse(name));
+        var result = parser.parse(name);
+        return new APIResponse(null, result);
     }
 
     @Override
@@ -32,13 +31,14 @@ public class RESTService implements APIService{
     }
 
     @Override
-    public void addTitle(Title title) {
+    public boolean addTitle(Title title) {
         titleStorageService.addTitle(title.name(), title.regex());
+        return true;
     }
 
     @Override
-    public void save(StructuredName name) {
-
+    public boolean save(StructuredName name) {
+        return true;
     }
 
     @Override

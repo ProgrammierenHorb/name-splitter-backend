@@ -1,6 +1,9 @@
 package com.example.namesplitter.parser;
 
+import com.example.namesplitter.exception.ConflictingGenderException;
+import com.example.namesplitter.exception.NameSplitterException;
 import com.example.namesplitter.model.Gender;
+import com.example.namesplitter.model.Location;
 import com.example.namesplitter.model.StructuredName;
 import com.example.namesplitter.storage.*;
 import com.example.namesplitter.storage.interfaces.NameGenderService;
@@ -9,12 +12,13 @@ import com.example.namesplitter.storage.interfaces.SalutationStorageService;
 import com.example.namesplitter.storage.interfaces.TitleStorageService;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.util.Strings;
 
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
-public class NameParser implements Parsable {
+public class NameParser implements Parser {
 
     private final TitleStorageService titleStorage = new InMemoryTitleStorage();
     private final SalutationStorageService salutationStorage = new InMemorySalutationService();
@@ -23,10 +27,14 @@ public class NameParser implements Parsable {
 
     @Override
     public StructuredName parse(String input) {
+        List<NameSplitterException> errors = new ArrayList<>();
+
         String firstName = "";
         String lastName = "";
 
-        var genderParseResult = parseGender(input);
+        Pair<Gender, String> genderParseResult;
+
+        genderParseResult = parseGender(input);
 
         Gender gender = genderParseResult.getLeft();
         input = genderParseResult.getRight().trim();
@@ -52,8 +60,7 @@ public class NameParser implements Parsable {
                 gender = potentialGender;
             }
         }
-
-        return new StructuredName(gender, titles, firstName, lastName, null);
+        return new StructuredName(gender, titles, firstName, lastName, generateStandardizedSalutation(gender, titles, firstName, lastName));
     }
 
     private Pair<String, String> parseTitle(String input) {
@@ -82,7 +89,9 @@ public class NameParser implements Parsable {
 
     private Pair<Gender, String> parseGender(String input) {
         for (var s : salutationStorage.getAllSalutations().entrySet()) {
-            if (input.startsWith(s.getKey())) {
+            Pattern pattern = Pattern.compile("^"+s.getKey(), Pattern.CASE_INSENSITIVE);
+            Matcher matcher = pattern.matcher(input);//Gender needs to be at the beginning of the string
+            if (matcher.find()) {
                 input = input.replaceFirst(s.getKey(), "");
                 return new ImmutablePair<>(s.getValue(), input);
             }
@@ -126,5 +135,12 @@ public class NameParser implements Parsable {
             return new ImmutablePair<>(String.join(" ", Arrays.stream(parts).toList().subList(0, lastNameStartIndex)), String.join(" ", Arrays.stream(parts).toList().subList(lastNameStartIndex, parts.length)));
         }
 
+    }
+
+    private String generateStandardizedSalutation(Gender gender, List<String> titles, String firstName, String lastName){
+        if(gender == null || gender == Gender.DIVERSE){
+            return "Guten Tag " + Strings.join(titles, ' ') + firstName + " " + lastName;
+        }
+        return gender == Gender.MALE ? "Sehr geehrter Herr " + Strings.join(titles, ' ') + " " + lastName : "Sehr geehrte Frau " + Strings.join(titles, ' ') + " " + lastName;
     }
 }

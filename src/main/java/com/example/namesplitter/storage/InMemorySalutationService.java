@@ -11,10 +11,10 @@ public class InMemorySalutationService implements SalutationStorageService {
     @Override
     public Map<String, Gender> getAllSalutations() {
         return new HashMap<>(Map.of(
-                "Herr", Gender.MALE,
-                "Frau", Gender.FEMALE,
-                "Mme.", Gender. FEMALE,
-                "Mrs.", Gender.FEMALE
+                "Herr\\s", Gender.MALE,
+                "Frau\\s", Gender.FEMALE,
+                "Mme\\.?\\s", Gender. FEMALE,
+                "Mrs\\.?\\s", Gender.FEMALE
         ));
     }
 }

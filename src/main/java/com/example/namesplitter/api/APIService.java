@@ -21,10 +21,10 @@ public interface APIService {
     public List<String> getTitles();
 
     @PostMapping("/addTitle")
-    public void addTitle(@PathVariable Title title);
+    public boolean addTitle(@PathVariable Title title);
 
     @PostMapping("/save")
-    public void save(@PathVariable StructuredName name);
+    public boolean save(@PathVariable StructuredName name);
 
     @GetMapping("/status")
     public String status();
