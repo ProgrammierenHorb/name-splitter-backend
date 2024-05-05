@@ -3,10 +3,7 @@ package com.example.namesplitter.api;
 import com.example.namesplitter.model.APIResponse;
 import com.example.namesplitter.model.StructuredName;
 import com.example.namesplitter.model.Title;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -21,10 +18,10 @@ public interface APIService {
     public List<String> getTitles();
 
     @PostMapping("/addTitle")
-    public boolean addTitle(@PathVariable Title title);
+    public boolean addTitle(@RequestBody Title title);
 
     @PostMapping("/save")
-    public boolean save(@PathVariable StructuredName name);
+    public boolean save(@RequestBody StructuredName name);
 
     @GetMapping("/status")
     public String status();
