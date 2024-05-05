@@ -40,4 +40,7 @@ public class RESTService implements APIService{
     public void save(StructuredName name) {
 
     }
+
+    @Override
+    public String status() {return "online";}
 }

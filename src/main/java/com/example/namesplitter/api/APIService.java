@@ -26,4 +26,6 @@ public interface APIService {
     @PostMapping("/save")
     public void save(@PathVariable StructuredName name);
 
+    @GetMapping("/status")
+    public String status();
 }
