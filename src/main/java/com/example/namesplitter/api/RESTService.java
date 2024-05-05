@@ -3,10 +3,12 @@ package com.example.namesplitter.api;
 import com.example.namesplitter.model.APIResponse;
 import com.example.namesplitter.model.Gender;
 import com.example.namesplitter.model.StructuredName;
+import com.example.namesplitter.model.Title;
 import com.example.namesplitter.parser.NameParser;
 import com.example.namesplitter.parser.Parsable;
 import com.example.namesplitter.storage.InMemoryTitleStorage;
 import com.example.namesplitter.storage.SQLiteNameGenderService;
+import com.example.namesplitter.storage.interfaces.TitleStorageService;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -14,6 +16,8 @@ import java.util.Map;
 
 @RestController
 public class RESTService implements APIService{
+
+    public TitleStorageService titleStorageService = new InMemoryTitleStorage();
 
     @Override
     public APIResponse parse(String name) {
@@ -24,12 +28,12 @@ public class RESTService implements APIService{
 
     @Override
     public List<String> getTitles() {
-        return new InMemoryTitleStorage().getAllTitles().values().stream().toList();
+       return titleStorageService.getAllTitles().values().stream().toList();
     }
 
     @Override
-    public void addTitle(String title) {
-
+    public void addTitle(Title title) {
+        titleStorageService.addTitle(title.name(), title.regex());
     }
 
     @Override
