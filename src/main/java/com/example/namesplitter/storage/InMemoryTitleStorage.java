@@ -35,7 +35,7 @@ public class InMemoryTitleStorage implements TitleStorageService {
     }
 
     @Override
-    public void addTitle(String regex, String title) {
+    public void addTitle(String title, String regex) {
         titles.put(regex, title);
     }
 
