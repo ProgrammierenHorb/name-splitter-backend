@@ -1,9 +1,9 @@
 package com.example.namesplitter.exception;
 
-import com.example.namesplitter.model.Location;
+import com.example.namesplitter.model.Position;
 
 public class NoLastNameGivenException extends NameSplitterException{
-    public NoLastNameGivenException(Location loc) {
+    public NoLastNameGivenException(Position loc) {
         super("Please provide at least a last name", loc);
     }
 }

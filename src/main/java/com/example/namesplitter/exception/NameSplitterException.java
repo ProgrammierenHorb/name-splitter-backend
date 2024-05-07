@@ -1,16 +1,16 @@
 package com.example.namesplitter.exception;
 
-import com.example.namesplitter.model.Location;
+import com.example.namesplitter.model.Position;
 
 public class NameSplitterException extends RuntimeException {
 
-    private Location loc;
+    private Position loc;
 
     public NameSplitterException(String message) {
         super(message);
     }
 
-    public NameSplitterException(String message, Location loc) {
+    public NameSplitterException(String message, Position loc) {
         super(message);
         this.loc = loc;
     }
