@@ -2,6 +2,7 @@ package com.example.namesplitter.parser;
 
 import com.example.namesplitter.exception.ConflictingGenderException;
 import com.example.namesplitter.exception.NameSplitterException;
+import com.example.namesplitter.exception.NoLastNameGivenException;
 import com.example.namesplitter.model.Gender;
 import com.example.namesplitter.model.Location;
 import com.example.namesplitter.model.StructuredName;
@@ -26,7 +27,9 @@ public class NameParser implements Parser {
     private final PatronymicsService patronymicsService = new InMemoryPatronymicsStorage();
 
     @Override
-    public StructuredName parse(String input) {
+    public Pair<StructuredName, List<? extends NameSplitterException>> parse(String input) {
+        String inputBackup = input;
+
         List<NameSplitterException> errors = new ArrayList<>();
 
         String firstName = "";
@@ -37,20 +40,25 @@ public class NameParser implements Parser {
         genderParseResult = parseGender(input);
 
         Gender gender = genderParseResult.getLeft();
-        input = genderParseResult.getRight().trim();
+        input = genderParseResult.getRight();
 
         List<String> titles = new ArrayList<>();
         Pair<String, String> title;
         while((title = parseTitle(input)).getLeft() != null)
         {
             titles.add(title.getLeft());
-            input = title.getRight().trim();
+            input = title.getRight();
         }
 
         Pair<String, String> name = parseName(input);
 
         firstName = name.getLeft();
         lastName = name.getRight();
+
+        if(lastName == null || lastName.isEmpty()){
+            errors.add(new NoLastNameGivenException(new Location(inputBackup.length() -1, inputBackup.length() - 1)));
+            return new ImmutablePair<>(new StructuredName(null, null, null, null, null), errors);
+        }
 
         //if no gender is found yet, try guessing with first name from name database
         if(gender == null && firstName != null){
@@ -60,7 +68,7 @@ public class NameParser implements Parser {
                 gender = potentialGender;
             }
         }
-        return new StructuredName(gender, titles, firstName, lastName, null);
+        return new ImmutablePair<>(new StructuredName(gender, titles, firstName, lastName, null), errors);
     }
 
     private Pair<String, String> parseTitle(String input) {
@@ -80,7 +88,7 @@ public class NameParser implements Parser {
         }
 
         if (longestMatch != null) {
-            input = input.replaceFirst(longestMatch, "").trim();
+            input = input.replaceFirst(longestMatch, "");
             return new ImmutablePair<>(longestTitle, input);
         }
 

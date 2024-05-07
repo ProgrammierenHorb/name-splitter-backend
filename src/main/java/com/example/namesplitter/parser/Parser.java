@@ -7,5 +7,5 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.List;
 
 public interface Parser {
-    StructuredName parse (String input);
+    Pair<StructuredName, List<? extends NameSplitterException>> parse (String input);
 }

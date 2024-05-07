@@ -1,6 +1,7 @@
 package com.example.namesplitter.api;
 
 import com.example.namesplitter.model.APIResponse;
+import com.example.namesplitter.model.ErrorDTO;
 import com.example.namesplitter.model.StructuredName;
 import com.example.namesplitter.model.Title;
 import com.example.namesplitter.parser.NameParser;
@@ -23,7 +24,7 @@ public class RESTService implements APIService{
         Parser parser = new NameParser();
         System.out.println(new SQLiteNameGenderService().getGender(name));
         var result = parser.parse(name);
-        return new APIResponse(null, result);
+        return new APIResponse(result.getRight().stream().map(excpt -> new ErrorDTO(excpt.getMessage(), excpt.getStartPos(), excpt.getEndPos())).toList(), result.getLeft());
     }
 
     @Override
