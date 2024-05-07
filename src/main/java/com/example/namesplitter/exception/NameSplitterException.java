@@ -2,7 +2,7 @@ package com.example.namesplitter.exception;
 
 import com.example.namesplitter.model.Position;
 
-public class NameSplitterException extends Exception {
+public class NameSplitterException extends RuntimeException {
 
     private Position loc;
 

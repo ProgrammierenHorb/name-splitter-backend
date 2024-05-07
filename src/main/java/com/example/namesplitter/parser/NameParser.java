@@ -5,6 +5,7 @@ import com.example.namesplitter.exception.NameSplitterException;
 import com.example.namesplitter.exception.NoLastNameGivenException;
 import com.example.namesplitter.model.CompleteName;
 import com.example.namesplitter.model.Position;
+import com.example.namesplitter.model.ReturnValueAndRemainigString;
 import com.example.namesplitter.storage.InMemoryPatronymicsStorage;
 import com.example.namesplitter.storage.interfaces.PatronymicsService;
 import org.apache.commons.lang3.text.WordUtils;
@@ -13,11 +14,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class NameParser {
+public class NameParser implements ISubParser<CompleteName> {
 
     PatronymicsService patronymicsService = InMemoryPatronymicsStorage.getInstance();
 
-    public CompleteName parseName(String name) throws NameSplitterException {
+    @Override
+    public ReturnValueAndRemainigString<CompleteName> parse(String name) throws NameSplitterException {
 
         name = name.trim();
 
@@ -48,8 +50,9 @@ public class NameParser {
             patronymsPos = getPositionOfPatronyms(parts[0]);
 
             //no patronymic found
-            if(patronymsPos.start() == -1) return new CompleteName(firstName.
-                    replaceAll(" +", " "), tempLastName.replaceAll(" +", "-"));
+            if(patronymsPos.start() == -1) return new ReturnValueAndRemainigString<>(new CompleteName(firstName.
+                    replaceAll(" +", " "), tempLastName.replaceAll(" +", "-")),
+                    "");
 
             patronymic = parts[0].substring(patronymsPos.start(), patronymsPos.end());
             lastName = parts[0].substring(patronymsPos.end() + 1);
@@ -59,10 +62,9 @@ public class NameParser {
             //no patronymic found
             if (patronymsPos.start() == -1) {
                 var parts = name.split(" ");
-                if (parts.length == 1) return new CompleteName(null, name.trim());
-                else {
-                    return new CompleteName(String.join(" ", Arrays.stream(parts).toList().subList(0, parts.length - 1)), parts[parts.length - 1]);
-                }
+                if (parts.length == 1) return new ReturnValueAndRemainigString<>(new CompleteName(null, name.trim()), "");
+                return new ReturnValueAndRemainigString<>(new CompleteName(String.join(" ", Arrays.stream(parts).toList().subList(0, parts.length - 1)), parts[parts.length - 1]),
+                        "");
             }
             patronymic = name.substring(patronymsPos.start(), patronymsPos.end());
             lastName = name.substring(patronymsPos.end() + 1);
@@ -98,9 +100,9 @@ public class NameParser {
 
         if (lastName.isEmpty())
             throw new NoLastNameGivenException(new Position(patronymsPos.end() + 1, patronymsPos.end() + 1));
-        if (firstName.isEmpty()) return new CompleteName(null, lastName);
+        if (firstName.isEmpty()) return new ReturnValueAndRemainigString<>(new CompleteName(null, lastName), "");
 
-        return new CompleteName(firstName, patronymic + " " + lastName);
+        return new ReturnValueAndRemainigString<>(new CompleteName(firstName, patronymic + " " + lastName), "");
     }
 
     /**

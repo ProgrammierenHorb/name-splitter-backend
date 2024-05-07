@@ -6,10 +6,6 @@ import com.example.namesplitter.exception.NoLastNameGivenException;
 import com.example.namesplitter.model.*;
 import com.example.namesplitter.storage.*;
 import com.example.namesplitter.storage.interfaces.NameGenderService;
-import com.example.namesplitter.storage.interfaces.PatronymicsService;
-import com.example.namesplitter.storage.interfaces.SalutationStorageService;
-import com.example.namesplitter.storage.interfaces.TitleStorageService;
-import org.apache.commons.lang3.text.WordUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import java.util.*;
@@ -23,11 +19,10 @@ import java.util.regex.Matcher;
  */
 public class Parser implements IParser {
 
-    // Services used for retrieving titles, salutations, genders, and patronymics
-    private final TitleStorageService titleStorage = InMemoryTitleStorage.getInstance();
-    private final SalutationStorageService salutationStorage = new InMemorySalutationService();
     private final NameGenderService nameGenderService = new SQLiteNameGenderService();
-    private final NameParser nameParser = new NameParser();
+    private final ISubParser<CompleteName> nameParser = new NameParser();
+    private final ISubParser<Gender> genderParser = new GenderParser();
+    private final ISubParser<TitleData> titleParser = new TitleParser();
 
     /**
      * The parse method takes an input string and parses it into a structured name.
@@ -61,24 +56,24 @@ public class Parser implements IParser {
         String firstName;
         String lastName;
 
-        Pair<Gender, String> genderParseResult;
+        ReturnValueAndRemainigString<Gender> genderParseResult;
 
-        genderParseResult = parseGender(input);
+        genderParseResult = genderParser.parse(input);
 
-        Gender gender = genderParseResult.getLeft();
-        input = genderParseResult.getRight();
+        Gender gender = genderParseResult.returnValue();
+        input = genderParseResult.remainingString();
 
         List<TitleData> titles = new ArrayList<>();
-        Pair<TitleData, String> title;
-        while ((title = parseTitle(input)).getLeft() != null) {
-            titles.add(title.getLeft());
-            input = title.getRight();
+        ReturnValueAndRemainigString<TitleData> title;
+        while ((title = titleParser.parse(input)).returnValue() != null) {
+            titles.add(title.returnValue());
+            input = title.remainingString();
         }
 
-        CompleteName completeName;
+        ReturnValueAndRemainigString<CompleteName> nameParserResult;
 
         try{
-            completeName = nameParser.parseName(input);
+            nameParserResult = nameParser.parse(input);
         }
         catch(NameSplitterException e){
             //relative position to absolute position
@@ -87,6 +82,8 @@ public class Parser implements IParser {
             errors.add(e);
             return new ImmutablePair<>(new StructuredName(null, null, null, null, null), errors);
         }
+
+        CompleteName completeName = nameParserResult.returnValue();
 
         firstName = completeName.firstName();
         lastName = completeName.lastName();
@@ -106,56 +103,4 @@ public class Parser implements IParser {
         }
         return new ImmutablePair<>(new StructuredName(gender, titles.stream().sorted().map(TitleData::name).toList(), firstName, lastName, null), errors);
     }
-
-    /**
-     * The parseTitle method takes an input string and tries to parse a title from it.
-     * It finds the longest matching title in the input string and removes it from the string.
-     * It returns a pair containing the title and the remaining input string.
-     *
-     * @param input The input string from which to parse a title.
-     * @return A Pair object containing the title and the remaining input string.
-     */
-    private Pair<TitleData, String> parseTitle(String input) {
-        String longestMatch = null;
-        TitleData longestTitle = null;
-
-        for (var s : titleStorage.getAllAcademicTitles()) {
-            Pattern pattern = Pattern.compile(s.regex(), Pattern.CASE_INSENSITIVE);
-            Matcher matcher = pattern.matcher(input);
-            if (matcher.find()) {
-                String match = matcher.group();
-                if (longestMatch == null || match.length() > longestMatch.length()) {
-                    longestMatch = match;
-                    longestTitle = s;
-                }
-            }
-        }
-        if (longestMatch != null) {
-            input = input.replaceFirst(longestMatch, "");
-            return new ImmutablePair<>(longestTitle, input);
-        }
-
-        return new ImmutablePair<>(null, input);
-    }
-
-    /**
-     * The parseGender method takes an input string and tries to parse a gender from it.
-     * It finds the first matching salutation in the input string and removes it from the string.
-     * It returns a pair containing the gender and the remaining input string.
-     *
-     * @param input The input string from which to parse a gender.
-     * @return A Pair object containing the gender and the remaining input string.
-     */
-    private Pair<Gender, String> parseGender(String input) {
-        for (var s : salutationStorage.getAllSalutations().entrySet()) {
-            Pattern pattern = Pattern.compile("^" + s.getKey(), Pattern.CASE_INSENSITIVE);
-            Matcher matcher = pattern.matcher(input);//Gender needs to be at the beginning of the string
-            if (matcher.find()) {
-                input = input.replaceFirst(s.getKey(), "");
-                return new ImmutablePair<>(s.getValue(), input);
-            }
-        }
-        return new ImmutablePair<>(null, input);
-    }
-
 }

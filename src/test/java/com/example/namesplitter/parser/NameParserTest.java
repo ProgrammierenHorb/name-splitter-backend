@@ -100,8 +100,6 @@ class NameParserTest {
         assertEquals(expected, nameParser.parse("Voss-Tecklenburg, Martina").getLeft());
     }
 
-
-    //TODO: Fix this test
     @Test
     void titleAndLastNameWithComma() {
         StructuredName expected = new StructuredName(Gender.MALE, new ArrayList<>(List.of("Dr.")), "John", "Doe", null);
