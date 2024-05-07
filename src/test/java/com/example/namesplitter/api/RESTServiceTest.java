@@ -38,10 +38,10 @@ class RESTServiceTest {
     @Test
     void testGetTitles() {
         // Mock title storage service
-        when(titleStorageService.getAllTitles()).thenReturn(Collections.singletonMap("Regex", "TitleDTO"));
+        when(titleStorageService.getAllTitles()).thenReturn(List.of(new TitleData("TitleDTO", "Regex", null, 100)));
         List<String> titles = restService.getTitles();
         assertEquals(1, titles.size());
-        assertEquals("TitleDTO", titles.get(0));
+        assertEquals("TitleDTO", titles.getFirst());
     }
 
     @Test

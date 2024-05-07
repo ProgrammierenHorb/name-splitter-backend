@@ -8,7 +8,13 @@ import java.util.*;
 
 public class InMemoryTitleStorage implements TitleStorageService {
 
-    public static List<TitleData> titles = new ArrayList<>(List.of(
+    private InMemoryTitleStorage(){
+        super();
+    }
+
+    private static TitleStorageService instance;
+
+    public List<TitleData> titles = new ArrayList<>(List.of(
             new TitleData("Dr[\\.|\\s*]rer[\\.|\\s*]nat[\\.|\\s]?", "Dr.rer.nat.", null, 3),
             new TitleData("Dr\\.?\\s*med\\.?\\s", "Dr.med.", null, 3),
             new TitleData("Dr\\.?\\s*phil\\.?\\s", "Dr.phil.", null, 3),
@@ -49,5 +55,9 @@ public class InMemoryTitleStorage implements TitleStorageService {
     @Override
     public boolean removeTitle(String regex) {
         return titles.remove(regex);
+    }
+
+    public static TitleStorageService getInstance() {
+        return instance == null ? new InMemoryTitleStorage() : instance;
     }
 }

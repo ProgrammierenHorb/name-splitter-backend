@@ -6,6 +6,7 @@ import com.example.namesplitter.exception.NoLastNameGivenException;
 import com.example.namesplitter.model.Gender;
 import com.example.namesplitter.model.Position;
 import com.example.namesplitter.model.StructuredName;
+import com.example.namesplitter.model.TitleData;
 import com.example.namesplitter.storage.*;
 import com.example.namesplitter.storage.interfaces.NameGenderService;
 import com.example.namesplitter.storage.interfaces.PatronymicsService;
@@ -26,7 +27,7 @@ import java.util.regex.Matcher;
 public class NameParser implements Parser {
 
     // Services used for retrieving titles, salutations, genders, and patronymics
-    private final TitleStorageService titleStorage = new InMemoryTitleStorage();
+    private final TitleStorageService titleStorage = InMemoryTitleStorage.getInstance();
     private final SalutationStorageService salutationStorage = new InMemorySalutationService();
     private final NameGenderService nameGenderService = new SQLiteNameGenderService();
     private final PatronymicsService patronymicsService = new InMemoryPatronymicsStorage();
@@ -74,8 +75,8 @@ public class NameParser implements Parser {
         Gender gender = genderParseResult.getLeft();
         input = genderParseResult.getRight();
 
-        List<String> titles = new ArrayList<>();
-        Pair<String, String> title;
+        List<TitleData> titles = new ArrayList<>();
+        Pair<TitleData, String> title;
         while ((title = parseTitle(input)).getLeft() != null) {
             titles.add(title.getLeft());
             input = title.getRight();
@@ -111,7 +112,7 @@ public class NameParser implements Parser {
                 gender = potentialGender;
             }
         }
-        return new ImmutablePair<>(new StructuredName(gender, titles, firstName, lastName, null), errors);
+        return new ImmutablePair<>(new StructuredName(gender, titles.stream().sorted().map(TitleData::name).toList(), firstName, lastName, null), errors);
     }
 
     /**
@@ -122,18 +123,18 @@ public class NameParser implements Parser {
      * @param input The input string from which to parse a title.
      * @return A Pair object containing the title and the remaining input string.
      */
-    private Pair<String, String> parseTitle(String input) {
+    private Pair<TitleData, String> parseTitle(String input) {
         String longestMatch = null;
-        String longestTitle = null;
+        TitleData longestTitle = null;
 
-        for (var s : titleStorage.getAllTitles().entrySet()) {
-            Pattern pattern = Pattern.compile(s.getKey(), Pattern.CASE_INSENSITIVE);
+        for (var s : titleStorage.getAllTitles()) {
+            Pattern pattern = Pattern.compile(s.regex(), Pattern.CASE_INSENSITIVE);
             Matcher matcher = pattern.matcher(input);
             if (matcher.find()) {
                 String match = matcher.group();
                 if (longestMatch == null || match.length() > longestMatch.length()) {
                     longestMatch = match;
-                    longestTitle = s.getValue();
+                    longestTitle = s;
                 }
             }
         }

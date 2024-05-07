@@ -2,7 +2,13 @@ package com.example.namesplitter.helper;
 
 import com.example.namesplitter.model.Gender;
 import com.example.namesplitter.model.StructuredName;
+import com.example.namesplitter.storage.InMemoryTitleStorage;
+import com.example.namesplitter.storage.interfaces.TitleStorageService;
 import org.apache.logging.log4j.util.Strings;
+
+import com.example.namesplitter.model.TitleData;
+
+import java.util.List;
 
 /**
  * The StandardizedSalutationGenerator class provides a static method to generate a standardized salutation for a given structured name.
@@ -24,10 +30,33 @@ public class StandardizedSalutationGenerator {
      * @return A string containing the standardized salutation.
      */
     public static String generateStandardizedSalutation(StructuredName name){
+
+        TitleStorageService titleStorageService = InMemoryTitleStorage.getInstance();
+
         StringBuilder salutation = new StringBuilder();
         //MALE or FEMALE Gender
         if(name.gender() == Gender.MALE || name.gender() == Gender.FEMALE){
             salutation.append(name.gender() == Gender.MALE ? "Sehr geehrter Herr " : "Sehr geehrte Frau ");
+
+            List<String> sortedTitles = List.copyOf(name.titles());
+            List<TitleData> savedTitles = titleStorageService.getAllTitles();
+
+            name.titles().sort((s1, s2) -> {
+                int p1 = savedTitles.stream()
+                        .filter(titleData -> titleData.name().equals(s1))
+                        .findFirst()
+                        .map(TitleData::priority)
+                        .orElse(Integer.MAX_VALUE); // or any default value
+
+                int p2 = savedTitles.stream()
+                        .filter(titleData -> titleData.name().equals(s2))
+                        .findFirst()
+                        .map(TitleData::priority)
+                        .orElse(Integer.MAX_VALUE); // or any default value
+
+                return Integer.compare(p1, p2);
+            });
+
             salutation.append(Strings.join(name.titles(), ' '));
             salutation.append(" ");
             salutation.append(name.lastName());
