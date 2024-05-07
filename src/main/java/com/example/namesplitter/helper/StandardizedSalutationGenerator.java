@@ -19,7 +19,7 @@ public class StandardizedSalutationGenerator {
 
         //DIVERSE Gender
         //no firstname given
-        if(name.firstName() == null){
+        if(name.firstName() == null || name.firstName().isBlank()){
             salutation.append("Sehr geehrte Damen und Herren");
             return salutation.toString();
         }
