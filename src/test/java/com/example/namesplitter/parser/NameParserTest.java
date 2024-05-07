@@ -12,11 +12,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class NameParserTest {
 
-    static NameParser nameParser;
+    static Parser nameParser;
 
     @BeforeAll
     static void setUp() {
-        nameParser = new NameParser();
+        nameParser = new Parser();
         assertNotNull(nameParser);
     }
 
@@ -139,6 +139,36 @@ class NameParserTest {
         StructuredName expected = new StructuredName(Gender.MALE, new ArrayList<>(List.of("Dr.")),  "Max Peter", "Mustermann",null);
         assertEquals(expected, nameParser.parse("Herr Dr. Max Peter Mustermann").getLeft());
     }
+    @Test
+    void vanHoof(){
+        StructuredName expected = new StructuredName(Gender.MALE, new ArrayList<>(List.of("Prof.", "Dr.phil.")),  "Antonius", "van Hoof",null);
+        assertEquals(expected, nameParser.parse("Herr Dr.phil. Prof. Antonius van Hoof").getLeft());
+    }
+
+    @Test
+    void vanHoof2(){
+        StructuredName expected = new StructuredName(Gender.MALE, new ArrayList<>(List.of("Prof.", "Dr.phil.")),  "Antonius", "van Hoof",null);
+        assertEquals(expected, nameParser.parse("van    Hoof,    Dr.    phil.    Prof.    Antonius").getLeft());
+    }
+
+    @Test
+    void y(){
+        StructuredName expected = new StructuredName(null, new ArrayList<>(),  "Estobar", "y Gonzales",null);
+        assertEquals(expected, nameParser.parse("Estobar y Gonzales").getLeft());
+    }
+
+    @Test
+    void y2(){
+        StructuredName expected = new StructuredName(null, new ArrayList<>(),  "Estobar", "y Gonzales",null);
+        assertEquals(expected, nameParser.parse("y Gonzales, Estobar").getLeft());
+    }
+
+    @Test
+    void fails(){
+        StructuredName expected = new StructuredName(null, new ArrayList<>(),  "Estobar", "y Gonzales-Müller",null);
+        assertEquals(expected, nameParser.parse("y Gonzales Müller, Herr Estobar").getLeft());
+    }
+
     //endregion
 
     //region Equivalence class 5	"Kein Vorname"
@@ -199,11 +229,11 @@ class NameParserTest {
 
 
     //Note: Test is probably not decidable by a simple algorithm
-/*    @Test
+    @Test
     void vonUndZuGutenberg(){
-        StructuredName expected = new StructuredName(Gender.MALE, new ArrayList<>(List.of("Dr.")), "Karl-Theodor Maria Nikolaus Johann Jacob Philipp Franz Joseph Sylvester", "Buhl-Freiherr von und zu Guttenberg", null);
-        assertEquals(expected, nameParser.parse("Herr Doktor Karl-Theodor Maria Nikolaus Johann Jacob Philipp Franz Joseph Sylvester Buhl-Freiherr von und zu Guttenberg"));
-    }*/
+        StructuredName expected = new StructuredName(Gender.MALE, new ArrayList<>(List.of("Dr.")), "Karl-Theodor Maria Nikolaus Johann Jacob Philipp Franz Joseph Sylvester", "von und zu Guttenberg", null);
+        assertEquals(expected, nameParser.parse("Herr Doktor Karl-Theodor Maria Nikolaus Johann Jacob Philipp Franz Joseph Sylvester von und zu Guttenberg").getLeft());
+    }
 
 
 

@@ -15,7 +15,7 @@ public record StructuredName(Gender gender, List<String> titles, String firstNam
         if (o == null || getClass() != o.getClass()) return false;
         StructuredName that = (StructuredName) o;
         return Objects.equals(gender, that.gender) &&
-                titles.equals(that.titles) &&
+                Objects.equals(titles, that.titles) &&
                 Objects.equals(firstName, that.firstName) &&
                 Objects.equals(lastName, that.lastName);
     }

@@ -3,239 +3,104 @@ package com.example.namesplitter.parser;
 import com.example.namesplitter.exception.InvalidCharacterException;
 import com.example.namesplitter.exception.NameSplitterException;
 import com.example.namesplitter.exception.NoLastNameGivenException;
-import com.example.namesplitter.model.Gender;
+import com.example.namesplitter.model.CompleteName;
 import com.example.namesplitter.model.Position;
-import com.example.namesplitter.model.StructuredName;
-import com.example.namesplitter.model.TitleData;
-import com.example.namesplitter.storage.*;
-import com.example.namesplitter.storage.interfaces.NameGenderService;
+import com.example.namesplitter.storage.InMemoryPatronymicsStorage;
 import com.example.namesplitter.storage.interfaces.PatronymicsService;
-import com.example.namesplitter.storage.interfaces.SalutationStorageService;
-import com.example.namesplitter.storage.interfaces.TitleStorageService;
 import org.apache.commons.lang3.text.WordUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import java.util.*;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
-/**🐒🐒🐒🐒
- * The NameParser class implements the Parser interface and provides methods to parse a name string into a structured name.
- * It uses services to retrieve titles, salutations, genders, and patronymics.
- * The parse method is the main method that orchestrates the parsing process.
- */
-public class NameParser implements Parser {
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-    // Services used for retrieving titles, salutations, genders, and patronymics
-    private final TitleStorageService titleStorage = InMemoryTitleStorage.getInstance();
-    private final SalutationStorageService salutationStorage = new InMemorySalutationService();
-    private final NameGenderService nameGenderService = new SQLiteNameGenderService();
-    private final PatronymicsService patronymicsService = new InMemoryPatronymicsStorage();
+public class NameParser {
 
-    /**
-     * The parse method takes an input string and parses it into a structured name.
-     * It first parses the gender, then the titles, and finally the name.
-     * If no last name is found, it adds an error to the list of errors.
-     * If no gender is found, it tries to guess the gender using the first name.
-     * It returns a pair containing the structured name and a list of errors.
-     *
-     * @param input The input string to be parsed.
-     * @return A Pair object containing the structured name and a list of errors.
-     */
-    @Override
-    public Pair<StructuredName, List<? extends NameSplitterException>> parse(String input) {
+    PatronymicsService patronymicsService = InMemoryPatronymicsStorage.getInstance();
 
-        String inputBackup = input;
+    public CompleteName parseName(String name) throws NameSplitterException {
 
-        List<NameSplitterException> errors = new ArrayList<>();
+        name = name.trim();
 
-        //support latin, chinese, portuguese,
-        String allowedSymbols = "^[\\p{L}\\p{M}\\p{Z}.,\\s-]+$";
-        Pattern pattern = Pattern.compile(allowedSymbols);
-        Matcher matcher = pattern.matcher(input);
-        if(!matcher.matches()) {
-            Matcher invalidCharMatcher = Pattern.compile("[^\\p{L}\\p{M}\\p{Z}.,\\s-]").matcher(input);
-            while (invalidCharMatcher.find()) {
-                errors.add(new InvalidCharacterException(new Position(invalidCharMatcher.start(), invalidCharMatcher.end() - 1)));
-            }
-            return new ImmutablePair<>(new StructuredName(null, null, null, null, null), errors);
-        }
-
-        if(!input.contains(" ")){
-            input = input + " ";
-        }
-
-        String firstName = "";
-        String lastName = "";
-
-        Pair<Gender, String> genderParseResult;
-
-        genderParseResult = parseGender(input);
-
-        Gender gender = genderParseResult.getLeft();
-        input = genderParseResult.getRight();
-
-        List<TitleData> titles = new ArrayList<>();
-        Pair<TitleData, String> title;
-        while ((title = parseTitle(input)).getLeft() != null) {
-            titles.add(title.getLeft());
-            input = title.getRight();
-        }
-
-        Pair<String, String> name;
-
-        try{
-           name = parseName(input);
-        }
-        catch(NameSplitterException e){
-            //relative position to absolute position
-            int startPosOfName = inputBackup.indexOf(input);
-            e.setPosition(new Position(startPosOfName + e.getStartPos(), startPosOfName + e.getEndPos()));
-            errors.add(e);
-            return new ImmutablePair<>(new StructuredName(null, null, null, null, null), errors);
-        }
-
-
-        firstName = name.getLeft();
-        lastName = name.getRight();
-
-        if (lastName == null || lastName.isEmpty()) {
-            errors.add(new NoLastNameGivenException(new Position(inputBackup.length() - 1, inputBackup.length() - 1)));
-            return new ImmutablePair<>(new StructuredName(null, null, null, null, null), errors);
-        }
-
-        //if no gender is found yet, try guessing with first name from name database
-        if (gender == null && firstName != null) {
-            firstName = firstName.trim();
-            Gender potentialGender = nameGenderService.getGender(firstName.split(" ")[0]);
-            if (potentialGender != null) {
-                gender = potentialGender;
-            }
-        }
-        return new ImmutablePair<>(new StructuredName(gender, titles.stream().sorted().map(TitleData::name).toList(), firstName, lastName, null), errors);
-    }
-
-    /**
-     * The parseTitle method takes an input string and tries to parse a title from it.
-     * It finds the longest matching title in the input string and removes it from the string.
-     * It returns a pair containing the title and the remaining input string.
-     *
-     * @param input The input string from which to parse a title.
-     * @return A Pair object containing the title and the remaining input string.
-     */
-    private Pair<TitleData, String> parseTitle(String input) {
-        String longestMatch = null;
-        TitleData longestTitle = null;
-
-        for (var s : titleStorage.getAllAcademicTitles()) {
-            Pattern pattern = Pattern.compile(s.regex(), Pattern.CASE_INSENSITIVE);
-            Matcher matcher = pattern.matcher(input);
-            if (matcher.find()) {
-                String match = matcher.group();
-                if (longestMatch == null || match.length() > longestMatch.length()) {
-                    longestMatch = match;
-                    longestTitle = s;
-                }
-            }
-        }
-
-        if (longestMatch != null) {
-            input = input.replaceFirst(longestMatch, "");
-            return new ImmutablePair<>(longestTitle, input);
-        }
-
-        return new ImmutablePair<>(null, input);
-    }
-
-    /**
-     * The parseGender method takes an input string and tries to parse a gender from it.
-     * It finds the first matching salutation in the input string and removes it from the string.
-     * It returns a pair containing the gender and the remaining input string.
-     *
-     * @param input The input string from which to parse a gender.
-     * @return A Pair object containing the gender and the remaining input string.
-     */
-    private Pair<Gender, String> parseGender(String input) {
-        for (var s : salutationStorage.getAllSalutations().entrySet()) {
-            Pattern pattern = Pattern.compile("^" + s.getKey(), Pattern.CASE_INSENSITIVE);
-            Matcher matcher = pattern.matcher(input);//Gender needs to be at the beginning of the string
-            if (matcher.find()) {
-                input = input.replaceFirst(s.getKey(), "");
-                return new ImmutablePair<>(s.getValue(), input);
-            }
-        }
-        return new ImmutablePair<>(null, input);
-    }
-
-    /**
-     * This method is used to parse a name from a given input string.
-     * The input string is first trimmed of any leading or trailing white spaces.
-     * If the input string is empty after trimming, the method returns a pair of null values.
-     * If the input string contains a comma, it is assumed that the string is in the format "Lastname, Firstname".
-     * The string is split at the comma and the parts are returned as a pair in the order "Firstname, Lastname".
-     * If the input string does not contain a comma, it is split into parts at the white spaces.
-     * The method then checks each part against a list of patronymics.
-     * If a part is found in the list of patronymics, it is assumed that this part and all following parts make up the last name.
-     * If no part is found in the list of patronymics, it is assumed that the last part is the last name and all preceding parts make up the first name.
-     * The method returns a pair of strings in the order "Firstname, Lastname".
-     *
-     * @param input The name string to be parsed.
-     * @return A Pair object containing a first name string and a last name string.
-     */
-    private Pair<String, String> parseName(String input) throws NameSplitterException {
-
-        input = input.trim();
-
-        //dot not allowed . in name
-        if(input.contains(".")){
-            throw new InvalidCharacterException(new Position(input.indexOf("."), input.indexOf(".")));
-        }
+        Position patronymsPos;
+        String lastName;
+        String firstName;
+        String patronymic;
 
         //if input is empty, return null
-        if (input.isEmpty()) {
+        if (name.isEmpty()) {
             throw new NoLastNameGivenException(new Position(0, 0));
         }
 
-        if (input.contains(",")) {
-            String[] parts = input.split(",");
-            if(parts.length > 1) throw new InvalidCharacterException(new Position(parts[1].indexOf(","), parts[1].indexOf(",")));
-
-            Position patronymsPos = getPositionOfPatronyms(parts[0]);
-
-            if(patronymsPos.start() == -1) return new ImmutablePair<>(parts[1].
-                    replaceAll(" +", " "), parts[0].replaceAll(" +", " ").replace(" ", "-"));
-
-            String patronym = parts[0].substring(patronymsPos.start(), patronymsPos.end()).toLowerCase();
-            var trimmedLastName = parts[0].substring(patronymsPos.end() + 1).trim();
-            //prettify name such that i.e. mÜllEr-MaIer is formatted to Müller-Maier
-            String lastName = WordUtils.capitalize(trimmedLastName.replace("-", " ").toLowerCase().replaceAll(" +", " ")).replace(" ", "-");
-
-            return new ImmutablePair<>(parts[1].trim(), patronym + " " + lastName);
+        //dot not allowed . in name
+        if(name.contains(".")){
+            throw new InvalidCharacterException(new Position(name.indexOf("."), name.indexOf(".")));
         }
 
+        if (name.contains(",")) {
+            String[] parts = name.split(",");
+            //more than 1 comma
+            if(parts.length > 2) throw new InvalidCharacterException(new Position(parts[1].indexOf(","), parts[1].indexOf(",")));
 
-        Position patronymsPos = getPositionOfPatronyms(input);
-        //no patronymic found
-        if (patronymsPos.start() == -1) {
-            var parts = input.split(" ");
-            if (parts.length == 1) return new ImmutablePair<>(null, input.trim());
-            else {
-                return new ImmutablePair<>(String.join(" ", Arrays.stream(parts).toList().subList(0, parts.length - 1)), parts[parts.length - 1]);
+
+            String tempLastName = parts[0];
+            firstName = parts[1];
+
+            patronymsPos = getPositionOfPatronyms(parts[0]);
+
+            //no patronymic found
+            if(patronymsPos.start() == -1) return new CompleteName(firstName.
+                    replaceAll(" +", " "), tempLastName.replaceAll(" +", "-"));
+
+            patronymic = parts[0].substring(patronymsPos.start(), patronymsPos.end());
+            lastName = parts[0].substring(patronymsPos.end() + 1);
+        }
+        else{
+            patronymsPos = getPositionOfPatronyms(name);
+            //no patronymic found
+            if (patronymsPos.start() == -1) {
+                var parts = name.split(" ");
+                if (parts.length == 1) return new CompleteName(null, name.trim());
+                else {
+                    return new CompleteName(String.join(" ", Arrays.stream(parts).toList().subList(0, parts.length - 1)), parts[parts.length - 1]);
+                }
+            }
+            patronymic = name.substring(patronymsPos.start(), patronymsPos.end());
+            lastName = name.substring(patronymsPos.end() + 1);
+            firstName = name.substring(0, patronymsPos.start() - 1);
+        }
+
+        lastName = lastName.trim();
+        firstName = firstName.trim();
+
+        List<Integer> positionOfHyphens = new ArrayList<>();
+
+        //make all patronymics lowercase
+        patronymic = patronymic.toLowerCase();
+
+        //remove all hyphens and remember their positions
+        for (int i = 0; i < firstName.length(); i++) {
+            if (firstName.charAt(i) == '-') {
+                firstName = firstName.replace("-", " ");
+                positionOfHyphens.add(i);
             }
         }
 
-        String patronymic = input.substring(patronymsPos.start(), patronymsPos.end()).toLowerCase();
-        String lastName = WordUtils.capitalize(input.substring(patronymsPos.end() + 1).replace("-", " ").toLowerCase());
-        String firstName = WordUtils.capitalize(input.substring(0, patronymsPos.start() - 1).toLowerCase());
+        //prettify name, i.e. KaRl-tHeoDoR GauS is formatted to Karl-Theodor Gaus
+        firstName = WordUtils.capitalize(firstName);
+
+        //reinsert hyphens at their original positions
+        for (int i : positionOfHyphens) {
+            firstName = firstName.substring(0, i) + "-" + firstName.substring(i + 1);
+        }
 
         //format double last names with a hyphen
         lastName = lastName.replace(' ', '-');
 
         if (lastName.isEmpty())
             throw new NoLastNameGivenException(new Position(patronymsPos.end() + 1, patronymsPos.end() + 1));
-        if (firstName.isEmpty()) return new ImmutablePair<>(null, lastName);
+        if (firstName.isEmpty()) return new CompleteName(null, lastName);
 
-        return new ImmutablePair<>(firstName, patronymic + " " + lastName);
+        return new CompleteName(firstName, patronymic + " " + lastName);
     }
 
     /**
@@ -254,13 +119,21 @@ public class NameParser implements Parser {
 
         //search for patronymics (i.e. "van", "von", "de" etc.) in the input string
         for (String patronymic : patronymics) {
-            lastNameStartIndex = input.toLowerCase().indexOf(patronymic + " ");
+            //if the string starts with patronymic, i.e. "van Hoof, Markus" one cannot assume there is a whitespace in front
+            if(input.startsWith(patronymic + " ")){
+                return new Position(0, patronymic.length());
+            }
+            lastNameStartIndex = input.toLowerCase().indexOf(" " + patronymic + " ");
             //the first patronymic found is taken as the beginning of the last name
             if (lastNameStartIndex == -1) continue;
+            else{
+                lastNameStartIndex++;
+            }
             if (lastNameStartIndex < earliestLastNameStartIndex) {
                 earliestLastNameStartIndex = lastNameStartIndex;
                 earliestLastNameEndIndex = lastNameStartIndex + patronymic.length();
             }
+
             //if two patronymics are found that start at the same position, the longer one is taken
             //i.e. "van den" ist taken over "van"
             else if (lastNameStartIndex <= earliestLastNameStartIndex && lastNameStartIndex + patronymic.length() > earliestLastNameEndIndex) {

@@ -38,7 +38,7 @@ class RESTServiceTest {
     @Test
     void testGetTitles() {
         // Mock title storage service
-        when(titleStorageService.getAllTitles()).thenReturn(List.of(new TitleData("TitleDTO", "Regex", null, 100)));
+        when(titleStorageService.getAllAcademicTitles()).thenReturn(List.of(new TitleData("TitleDTO", "Regex", null, 100)));
         List<String> titles = restService.getTitles();
         assertEquals(1, titles.size());
         assertEquals("TitleDTO", titles.getFirst());

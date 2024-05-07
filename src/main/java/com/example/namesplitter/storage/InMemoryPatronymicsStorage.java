@@ -8,7 +8,11 @@ import java.util.Set;
 
 public class InMemoryPatronymicsStorage implements PatronymicsService {
 
-    static Set<String> patronymics = new HashSet<String>(Set.of(
+    private InMemoryPatronymicsStorage() {
+        super();
+    }
+
+     private final Set<String> patronymics = new HashSet<String>(Set.of(
             "van",
             "de",
             "den",
@@ -25,8 +29,15 @@ public class InMemoryPatronymicsStorage implements PatronymicsService {
             "vom",
             "y"
     ));
+
+    static InMemoryPatronymicsStorage instance;
+
     @Override
     public List<String> getAllPatronymics() {
         return patronymics.stream().toList();
+    }
+
+    public static InMemoryPatronymicsStorage getInstance() {
+        return instance == null ? instance = new InMemoryPatronymicsStorage() : instance;
     }
 }
