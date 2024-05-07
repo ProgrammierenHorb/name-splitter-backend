@@ -5,7 +5,7 @@ import com.example.namesplitter.model.StructuredName;
 import com.example.namesplitter.model.Title;
 import com.example.namesplitter.parser.NameParser;
 import com.example.namesplitter.parser.Parser;
-import com.example.namesplitter.parser.StandardizedSalutationGenerator;
+import com.example.namesplitter.helper.StandardizedSalutationGenerator;
 import com.example.namesplitter.storage.InMemoryTitleStorage;
 import com.example.namesplitter.storage.SQLiteNameGenderService;
 import com.example.namesplitter.storage.interfaces.TitleStorageService;

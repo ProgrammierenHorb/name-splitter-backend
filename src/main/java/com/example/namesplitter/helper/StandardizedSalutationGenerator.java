@@ -1,4 +1,4 @@
-package com.example.namesplitter.parser;
+package com.example.namesplitter.helper;
 
 import com.example.namesplitter.model.Gender;
 import com.example.namesplitter.model.StructuredName;
@@ -12,6 +12,7 @@ public class StandardizedSalutationGenerator {
         if(name.gender() == Gender.MALE || name.gender() == Gender.FEMALE){
             salutation.append(name.gender() == Gender.MALE ? "Sehr geehrter Herr " : "Sehr geehrte Frau ");
             salutation.append(Strings.join(name.titles(), ' '));
+            salutation.append(" ");
             salutation.append(name.lastName());
             return salutation.toString();
         }
