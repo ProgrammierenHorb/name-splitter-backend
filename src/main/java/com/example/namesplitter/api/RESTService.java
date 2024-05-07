@@ -13,7 +13,7 @@ import java.util.List;
 @RestController
 public class RESTService implements APIService{
 
-    public TitleStorageService titleStorageService = new InMemoryTitleStorage();
+    public TitleStorageService titleStorageService = InMemoryTitleStorage.getInstance();
 
     @Override
     public APIResponse parse(String name) {
@@ -31,6 +31,12 @@ public class RESTService implements APIService{
     public boolean addTitle(TitleDTO titleDTO) {
         return titleStorageService.addTitle(titleDTO.name(), titleDTO.regex());
     }
+
+    @Override
+    public boolean removeTitle(String title) {
+        return titleStorageService.removeTitle(title);
+    }
+
 
     @Override
     public StructuredName save(StructuredName name) {

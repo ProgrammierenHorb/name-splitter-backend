@@ -19,6 +19,8 @@ public interface APIService {
     @PostMapping("/addTitle")
     public boolean addTitle(@RequestBody TitleDTO titleDTO);
 
+    @PostMapping("/removeTitle")
+    public boolean removeTitle(@RequestBody String title);
 
     @PostMapping("/save")
     public StructuredName save(@RequestBody StructuredName name);
