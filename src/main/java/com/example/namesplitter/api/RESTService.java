@@ -1,9 +1,6 @@
 package com.example.namesplitter.api;
 
-import com.example.namesplitter.model.APIResponse;
-import com.example.namesplitter.model.ErrorDTO;
-import com.example.namesplitter.model.StructuredName;
-import com.example.namesplitter.model.Title;
+import com.example.namesplitter.model.*;
 import com.example.namesplitter.parser.NameParser;
 import com.example.namesplitter.parser.Parser;
 import com.example.namesplitter.helper.StandardizedSalutationGenerator;
@@ -27,13 +24,12 @@ public class RESTService implements APIService{
 
     @Override
     public List<String> getTitles() {
-       return titleStorageService.getAllTitles().values().stream().toList();
+        return titleStorageService.getAllTitles().stream().map(TitleData::name).toList();
     }
 
     @Override
-    public boolean addTitle(Title title) {
-        titleStorageService.addTitle(title.name(), title.regex());
-        return true;
+    public boolean addTitle(TitleDTO titleDTO) {
+        return titleStorageService.addTitle(titleDTO.name(), titleDTO.regex());
     }
 
     @Override

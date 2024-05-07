@@ -1,13 +1,7 @@
 package com.example.namesplitter.api;
 
-import com.example.namesplitter.api.RESTService;
-import com.example.namesplitter.exception.NameSplitterException;
 import com.example.namesplitter.model.*;
-import com.example.namesplitter.parser.NameParser;
-import com.example.namesplitter.parser.Parser;
-import com.example.namesplitter.storage.SQLiteNameGenderService;
 import com.example.namesplitter.storage.interfaces.TitleStorageService;
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -44,18 +38,18 @@ class RESTServiceTest {
     @Test
     void testGetTitles() {
         // Mock title storage service
-        when(titleStorageService.getAllTitles()).thenReturn(Collections.singletonMap("Regex", "Title"));
+        when(titleStorageService.getAllTitles()).thenReturn(Collections.singletonMap("Regex", "TitleDTO"));
         List<String> titles = restService.getTitles();
         assertEquals(1, titles.size());
-        assertEquals("Title", titles.get(0));
+        assertEquals("TitleDTO", titles.get(0));
     }
 
     @Test
     void testAddTitle() {
-        Title title = new Title("Title", "Regex");
-        assertTrue(restService.addTitle(title));
-        // Verify that title is added to the title storage service
-        verify(titleStorageService, times(1)).addTitle("Title", "Regex");
+        TitleDTO titleDTO = new TitleDTO("TitleDTO", "Regex");
+        assertTrue(restService.addTitle(titleDTO));
+        // Verify that titleDTO is added to the titleDTO storage service
+        verify(titleStorageService, times(1)).addTitle("TitleDTO", "Regex");
     }
 
     @Test

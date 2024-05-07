@@ -197,6 +197,7 @@ public class NameParser implements Parser {
 
         if (input.contains(",")) {
             String[] parts = input.split(",");
+            if(parts.length > 1) throw new InvalidCharacterException(new Position(parts[1].indexOf(","), parts[1].indexOf(",")));
 
             Position patronymsPos = getPositionOfPatronyms(parts[0]);
 
