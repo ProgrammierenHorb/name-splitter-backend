@@ -22,4 +22,8 @@ public class NameSplitterException extends Exception {
     public int getEndPos(){
         return loc.end();
     }
+
+    public void setPosition(Position loc){
+        this.loc = loc;
+    }
 }

@@ -14,12 +14,11 @@ import com.example.namesplitter.storage.interfaces.TitleStorageService;
 import org.apache.commons.lang3.text.WordUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
-/**
+/**🐒🐒🐒🐒
  * The NameParser class implements the Parser interface and provides methods to parse a name string into a structured name.
  * It uses services to retrieve titles, salutations, genders, and patronymics.
  * The parse method is the main method that orchestrates the parsing process.
@@ -49,17 +48,20 @@ public class NameParser implements Parser {
 
         List<NameSplitterException> errors = new ArrayList<>();
 
-
-
-        String allowedSymbols = "^[a-zA-Z.,\\s-]+$";
+        //support latin, chinese, portuguese,
+        String allowedSymbols = "^[\\p{L}\\p{M}\\p{Z}.,\\s-]+$";
         Pattern pattern = Pattern.compile(allowedSymbols);
         Matcher matcher = pattern.matcher(input);
         if(!matcher.matches()) {
-            Matcher invalidCharMatcher = Pattern.compile("[^a-zA-Z.,\\s-]").matcher(input);
+            Matcher invalidCharMatcher = Pattern.compile("[^\\p{L}\\p{M}\\p{Z}.,\\s-]").matcher(input);
             while (invalidCharMatcher.find()) {
                 errors.add(new InvalidCharacterException(new Position(invalidCharMatcher.start(), invalidCharMatcher.end() - 1)));
             }
             return new ImmutablePair<>(new StructuredName(null, null, null, null, null), errors);
+        }
+
+        if(!input.contains(" ")){
+            input = input + " ";
         }
 
         String firstName = "";
@@ -84,7 +86,10 @@ public class NameParser implements Parser {
         try{
            name = parseName(input);
         }
-        catch(NoLastNameGivenException e){
+        catch(NameSplitterException e){
+            //relative position to absolute position
+            int startPosOfName = inputBackup.indexOf(input);
+            e.setPosition(new Position(startPosOfName + e.getStartPos(), startPosOfName + e.getEndPos()));
             errors.add(e);
             return new ImmutablePair<>(new StructuredName(null, null, null, null, null), errors);
         }
@@ -176,9 +181,14 @@ public class NameParser implements Parser {
      * @param input The name string to be parsed.
      * @return A Pair object containing a first name string and a last name string.
      */
-    private Pair<String, String> parseName(String input) throws NoLastNameGivenException {
+    private Pair<String, String> parseName(String input) throws NameSplitterException {
 
         input = input.trim();
+
+        //dot not allowed . in name
+        if(input.contains(".")){
+            throw new InvalidCharacterException(new Position(input.indexOf("."), input.indexOf(".")));
+        }
 
         //if input is empty, return null
         if (input.isEmpty()) {
@@ -190,15 +200,17 @@ public class NameParser implements Parser {
 
             Position patronymsPos = getPositionOfPatronyms(parts[0]);
 
-            if(patronymsPos.start() == -1) return new ImmutablePair<>(parts[1].trim(), parts[0].trim().replace(" ", "-"));
+            if(patronymsPos.start() == -1) return new ImmutablePair<>(parts[1].
+                    replaceAll(" +", " "), parts[0].replaceAll(" +", " ").replace(" ", "-"));
 
             String patronym = parts[0].substring(patronymsPos.start(), patronymsPos.end()).toLowerCase();
             var trimmedLastName = parts[0].substring(patronymsPos.end() + 1).trim();
             //prettify name such that i.e. mÜllEr-MaIer is formatted to Müller-Maier
-            String lastName = WordUtils.capitalize(trimmedLastName.replace("-", " ").toLowerCase()).replaceAll(" +", "-");
+            String lastName = WordUtils.capitalize(trimmedLastName.replace("-", " ").toLowerCase().replaceAll(" +", " ")).replace(" ", "-");
 
             return new ImmutablePair<>(parts[1].trim(), patronym + " " + lastName);
         }
+
 
         Position patronymsPos = getPositionOfPatronyms(input);
         //no patronymic found

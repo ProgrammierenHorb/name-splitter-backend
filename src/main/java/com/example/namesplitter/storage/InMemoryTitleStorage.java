@@ -7,7 +7,7 @@ import java.util.*;
 public class InMemoryTitleStorage implements TitleStorageService {
 
     public static Map<String, String> titles = new HashMap<>(Map.ofEntries(
-            Map.entry("Dr\\.?\\s*rer\\.?\\s*nat\\.?\\s", "Dr.rer.nat."),
+            Map.entry("Dr[\\.|\\s*]rer[\\.|\\s*]nat[\\.|\\s]?", "Dr.rer.nat."),
             Map.entry("Dr\\.?\\s*med\\.?\\s", "Dr.med."),
             Map.entry("Dr\\.?\\s*phil\\.?\\s", "Dr.phil."),
             Map.entry("Dr\\.?\\s*rer\\.?\\s*pol\\.?\\s", "Dr.rer.pol."),
@@ -15,9 +15,9 @@ public class InMemoryTitleStorage implements TitleStorageService {
             Map.entry("Dr\\.?\\s*h\\.?\\s*c\\.?\\s*mult\\.?\\s", "Dr.h.c.mult."),
             Map.entry("Dr\\.?-Ing\\.?\\s", "Dr.-Ing."),
             Map.entry("Prof\\.?\\s", "Prof."),
-            Map.entry("Professor\\s", "Prof."),
+            Map.entry("Professor\\s?", "Prof."),
             Map.entry("Dr\\.?\\s", "Dr."),
-            Map.entry("Doktor\\s", "Dr."),
+            Map.entry("Doktor\\s?", "Dr."),
             Map.entry("B\\.?\\s*A\\.?\\s", "B.A."),
             Map.entry("B\\.?\\s*Sc\\.?\\s", "B.Sc."),
             Map.entry("B\\.?\\s*Eng\\.?\\s", "B.Eng."),
