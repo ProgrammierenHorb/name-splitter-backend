@@ -127,7 +127,7 @@ public class NameParser implements Parser {
         String longestMatch = null;
         TitleData longestTitle = null;
 
-        for (var s : titleStorage.getAllTitles()) {
+        for (var s : titleStorage.getAllAcademicTitles()) {
             Pattern pattern = Pattern.compile(s.regex(), Pattern.CASE_INSENSITIVE);
             Matcher matcher = pattern.matcher(input);
             if (matcher.find()) {

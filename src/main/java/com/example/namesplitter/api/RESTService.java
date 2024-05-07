@@ -24,7 +24,7 @@ public class RESTService implements APIService{
 
     @Override
     public List<String> getTitles() {
-        return titleStorageService.getAllTitles().stream().map(TitleData::name).toList();
+        return titleStorageService.getAllAcademicTitles().stream().map(TitleData::name).toList();
     }
 
     @Override

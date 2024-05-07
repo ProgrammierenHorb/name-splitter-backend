@@ -14,7 +14,7 @@ public class InMemoryTitleStorage implements TitleStorageService {
 
     private static TitleStorageService instance;
 
-    public List<TitleData> titles = new ArrayList<>(List.of(
+    public List<TitleData> academicTitles = new ArrayList<>(List.of(
             new TitleData("Dr[\\.|\\s*]rer[\\.|\\s*]nat[\\.|\\s]?", "Dr.rer.nat.", null, 3),
             new TitleData("Dr\\.?\\s*med\\.?\\s", "Dr.med.", null, 3),
             new TitleData("Dr\\.?\\s*phil\\.?\\s", "Dr.phil.", null, 3),
@@ -25,8 +25,10 @@ public class InMemoryTitleStorage implements TitleStorageService {
             new TitleData("Dr\\.?-Ing\\.?\\s", "Dr.-Ing.", null, 3),
             new TitleData("Prof\\.?\\s", "Prof.", null, 1),
             new TitleData("Professor\\s?", "Prof.", Gender.MALE, 2),
+            new TitleData("Professorin\\s?", "Prof.", Gender.FEMALE, 2),
             new TitleData("Dr\\.?\\s", "Dr.", null, 3),
             new TitleData("Doktor\\s?", "Dr.", Gender.MALE, 3),
+            new TitleData("Doktorin\\s?", "Dr.", Gender.FEMALE, 3),
             new TitleData("B\\.?\\s*A\\.?\\s", "B.A.", null, 6),
             new TitleData("B\\.?\\s*Sc\\.?\\s", "B.Sc.", null, 6),
             new TitleData("B\\.?\\s*Eng\\.?\\s", "B.Eng.", null, 6),
@@ -38,23 +40,60 @@ public class InMemoryTitleStorage implements TitleStorageService {
             new TitleData("Dr\\.?\\s*habil\\.?\\s", "Dr.habil.", null, 2)
     ));
 
+    //https://de.wikipedia.org/wiki/Adelstitel
+    public List<TitleData> titleOfNobility = new ArrayList<>(List.of(
+            new TitleData("Kaiser|Zar", "Kaiser", Gender.MALE, Integer.MAX_VALUE),
+            new TitleData("Kaiserin|Zariza", "Kaiserin", Gender.FEMALE, Integer.MAX_VALUE),
+            new TitleData("König", "König", Gender.MALE, Integer.MAX_VALUE),
+            new TitleData("Königin", "Königin", Gender.FEMALE, Integer.MAX_VALUE),
+            new TitleData("Erzherzog", "Erzherzog", Gender.MALE, Integer.MAX_VALUE),
+            new TitleData("Erzherzogin", "Erzherzogin", Gender.FEMALE, Integer.MAX_VALUE),
+            new TitleData("Großherzog", "Großherzog", Gender.MALE, Integer.MAX_VALUE),
+            new TitleData("Großherzogin", "Großherzogin", Gender.FEMALE, Integer.MAX_VALUE),
+            new TitleData("Kurfürst", "Kurfürst", Gender.MALE, Integer.MAX_VALUE),
+            new TitleData("Kurfürstin", "Kurfürstin", Gender.FEMALE, Integer.MAX_VALUE),
+            new TitleData("Herzog", "Herzog", Gender.MALE, Integer.MAX_VALUE),
+            new TitleData("Herzogin", "Herzogin", Gender.FEMALE, Integer.MAX_VALUE),
+            new TitleData("Landgraf", "Landgraf", Gender.MALE, Integer.MAX_VALUE),
+            new TitleData("Landgräfin", "Landgräfin", Gender.FEMALE, Integer.MAX_VALUE),
+            new TitleData("Pfalzgraf", "Pfalzgraf", Gender.MALE, Integer.MAX_VALUE),
+            new TitleData("Pfalzgräfin", "Pfalzgräfin", Gender.FEMALE, Integer.MAX_VALUE),
+            new TitleData("Markgraf", "Markgraf", Gender.MALE, Integer.MAX_VALUE),
+            new TitleData("Markgräfin", "Markgräfin", Gender.FEMALE, Integer.MAX_VALUE),
+            new TitleData("Fürst", "Fürst", Gender.MALE, Integer.MAX_VALUE),
+            new TitleData("Fürstin", "Fürstin", Gender.FEMALE, Integer.MAX_VALUE),
+            new TitleData("Graf", "Graf", Gender.MALE, Integer.MAX_VALUE),
+            new TitleData("Gräfin", "Gräfin", Gender.FEMALE, Integer.MAX_VALUE),
+            new TitleData("Freiherr", "Freiherr", Gender.MALE, Integer.MAX_VALUE),
+            new TitleData("Baron", "Baron", Gender.MALE, Integer.MAX_VALUE),
+            new TitleData("Freifrau|Baronin", "Freifrau", Gender.FEMALE, Integer.MAX_VALUE),
+            new TitleData("Baronin", "Baronin", Gender.FEMALE, Integer.MAX_VALUE)
+    ));
+
     @Override
-    public List<TitleData> getAllTitles() {
-        return List.copyOf(titles);
+    public List<TitleData> getAllAcademicTitles() {
+        return List.copyOf(academicTitles);
     }
 
     @Override
     public boolean addTitle(String title, String regex) {
-        if(titles.contains(title)) {
+        if(academicTitles.contains(title)) {
             return false;
         }
-        titles.add(new TitleData(regex, title, null, 100));
+        academicTitles.add(new TitleData(regex, title, null, 100));
         return true;
     }
 
     @Override
-    public boolean removeTitle(String regex) {
-        return titles.remove(regex);
+    public boolean removeTitle(String name) {
+        for (Iterator<TitleData> iterator = academicTitles.iterator(); iterator.hasNext();) {
+            TitleData titleData = iterator.next();
+            if (titleData.name().equals(name)) {
+                iterator.remove();
+                return true;
+            }
+        }
+        return false;
     }
 
     public static TitleStorageService getInstance() {

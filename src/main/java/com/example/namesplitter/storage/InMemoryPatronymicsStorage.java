@@ -19,9 +19,11 @@ public class InMemoryPatronymicsStorage implements PatronymicsService {
             "uit",
             "van den",
             "van der",
+            "von und zu",
             "von",
             "zu",
-            "vom"
+            "vom",
+            "y"
     ));
     @Override
     public List<String> getAllPatronymics() {

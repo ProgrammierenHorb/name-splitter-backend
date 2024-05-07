@@ -39,8 +39,9 @@ public class StandardizedSalutationGenerator {
             salutation.append(name.gender() == Gender.MALE ? "Sehr geehrter Herr " : "Sehr geehrte Frau ");
 
             List<String> sortedTitles = List.copyOf(name.titles());
-            List<TitleData> savedTitles = titleStorageService.getAllTitles();
+            List<TitleData> savedTitles = titleStorageService.getAllAcademicTitles();
 
+            //sort the given titles by the priority saved in the TitleStorageService
             name.titles().sort((s1, s2) -> {
                 int p1 = savedTitles.stream()
                         .filter(titleData -> titleData.name().equals(s1))
