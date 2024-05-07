@@ -5,6 +5,10 @@ import java.util.Objects;
 
 public record StructuredName(Gender gender, List<String> titles, String firstName, String lastName, String standardizedSalutation){
 
+    public StructuredName(StructuredName name, String standardizedSalutation){
+        this(name.gender(), name.titles(), name.firstName(), name.lastName(), standardizedSalutation);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

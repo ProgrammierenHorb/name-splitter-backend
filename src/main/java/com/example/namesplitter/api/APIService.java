@@ -21,7 +21,7 @@ public interface APIService {
     public boolean addTitle(@RequestBody Title title);
 
     @PostMapping("/save")
-    public boolean save(@RequestBody StructuredName name);
+    public StructuredName save(@RequestBody StructuredName name);
 
     @GetMapping("/status")
     public String status();

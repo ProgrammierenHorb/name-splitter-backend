@@ -5,6 +5,7 @@ import com.example.namesplitter.model.StructuredName;
 import com.example.namesplitter.model.Title;
 import com.example.namesplitter.parser.NameParser;
 import com.example.namesplitter.parser.Parser;
+import com.example.namesplitter.parser.StandardizedSalutationGenerator;
 import com.example.namesplitter.storage.InMemoryTitleStorage;
 import com.example.namesplitter.storage.SQLiteNameGenderService;
 import com.example.namesplitter.storage.interfaces.TitleStorageService;
@@ -37,8 +38,9 @@ public class RESTService implements APIService{
     }
 
     @Override
-    public boolean save(StructuredName name) {
-        return true;
+    public StructuredName save(StructuredName name) {
+        //TODO: save into database
+        return new StructuredName(name, StandardizedSalutationGenerator.generateStandardizedSalutation(name));
     }
 
     @Override

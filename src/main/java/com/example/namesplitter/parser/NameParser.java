@@ -60,7 +60,7 @@ public class NameParser implements Parser {
                 gender = potentialGender;
             }
         }
-        return new StructuredName(gender, titles, firstName, lastName, generateStandardizedSalutation(gender, titles, firstName, lastName));
+        return new StructuredName(gender, titles, firstName, lastName, null);
     }
 
     private Pair<String, String> parseTitle(String input) {
@@ -135,12 +135,5 @@ public class NameParser implements Parser {
             return new ImmutablePair<>(String.join(" ", Arrays.stream(parts).toList().subList(0, lastNameStartIndex)), String.join(" ", Arrays.stream(parts).toList().subList(lastNameStartIndex, parts.length)));
         }
 
-    }
-
-    private String generateStandardizedSalutation(Gender gender, List<String> titles, String firstName, String lastName){
-        if(gender == null || gender == Gender.DIVERSE){
-            return "Guten Tag " + Strings.join(titles, ' ') + firstName + " " + lastName;
-        }
-        return gender == Gender.MALE ? "Sehr geehrter Herr " + Strings.join(titles, ' ') + " " + lastName : "Sehr geehrte Frau " + Strings.join(titles, ' ') + " " + lastName;
     }
 }
