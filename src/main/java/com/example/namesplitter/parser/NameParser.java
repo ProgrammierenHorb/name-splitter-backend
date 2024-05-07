@@ -18,13 +18,29 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
+/**
+ * The NameParser class implements the Parser interface and provides methods to parse a name string into a structured name.
+ * It uses services to retrieve titles, salutations, genders, and patronymics.
+ * The parse method is the main method that orchestrates the parsing process.
+ */
 public class NameParser implements Parser {
 
+    // Services used for retrieving titles, salutations, genders, and patronymics
     private final TitleStorageService titleStorage = new InMemoryTitleStorage();
     private final SalutationStorageService salutationStorage = new InMemorySalutationService();
     private final NameGenderService nameGenderService = new SQLiteNameGenderService();
     private final PatronymicsService patronymicsService = new InMemoryPatronymicsStorage();
 
+    /**
+     * The parse method takes an input string and parses it into a structured name.
+     * It first parses the gender, then the titles, and finally the name.
+     * If no last name is found, it adds an error to the list of errors.
+     * If no gender is found, it tries to guess the gender using the first name.
+     * It returns a pair containing the structured name and a list of errors.
+     *
+     * @param input The input string to be parsed.
+     * @return A Pair object containing the structured name and a list of errors.
+     */
     @Override
     public Pair<StructuredName, List<? extends NameSplitterException>> parse(String input) {
         String inputBackup = input;
@@ -69,6 +85,14 @@ public class NameParser implements Parser {
         return new ImmutablePair<>(new StructuredName(gender, titles, firstName, lastName, null), errors);
     }
 
+    /**
+     * The parseTitle method takes an input string and tries to parse a title from it.
+     * It finds the longest matching title in the input string and removes it from the string.
+     * It returns a pair containing the title and the remaining input string.
+     *
+     * @param input The input string from which to parse a title.
+     * @return A Pair object containing the title and the remaining input string.
+     */
     private Pair<String, String> parseTitle(String input) {
         String longestMatch = null;
         String longestTitle = null;
@@ -93,6 +117,14 @@ public class NameParser implements Parser {
         return new ImmutablePair<>(null, input);
     }
 
+    /**
+     * The parseGender method takes an input string and tries to parse a gender from it.
+     * It finds the first matching salutation in the input string and removes it from the string.
+     * It returns a pair containing the gender and the remaining input string.
+     *
+     * @param input The input string from which to parse a gender.
+     * @return A Pair object containing the gender and the remaining input string.
+     */
     private Pair<Gender, String> parseGender(String input) {
         for (var s : salutationStorage.getAllSalutations().entrySet()) {
             Pattern pattern = Pattern.compile("^" + s.getKey(), Pattern.CASE_INSENSITIVE);
@@ -169,19 +201,12 @@ public class NameParser implements Parser {
     }
 
     /**
-     * This method is used to find the position of patronymics in a given input string.
-     * Patronymics are parts of a name that indicate lineage and are often used in many cultures.
-     * Examples of patronymics include "van", "von", "de" etc.
-     * The method first retrieves a list of all patronymics from the patronymicsService.
-     * It then iterates over each patronymic and checks if it is present in the input string.
-     * If a patronymic is found in the input string, the method checks if its position is earlier than the current earliest position.
-     * If it is, the method updates the earliest position and the end position to the current patronymic's position and length respectively.
-     * If two patronymics start at the same position, the method chooses the longer one.
-     * After checking all patronymics, the method returns a pair of integers representing the start and end position of the earliest patronymic found.
-     * If no patronymic is found, the method returns a pair of -1.
+     * The getPositionOfPatronyms method takes an input string and finds the position of patronymics in it.
+     * It iterates over each patronymic and checks if it is present in the input string.
+     * It returns a Position object containing the start and end position of the earliest patronymic found.
      *
-     * @param input The string in which to find the position of patronymics.
-     * @return A Pair object containing the start and end position of the earliest patronymic found.
+     * @param input The input string in which to find the position of patronymics.
+     * @return A Position object containing the start and end position of the earliest patronymic found.
      */
     private Position getPositionOfPatronyms(String input) {
         List<String> patronymics = patronymicsService.getAllPatronymics();

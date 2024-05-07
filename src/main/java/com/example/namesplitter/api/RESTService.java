@@ -8,7 +8,6 @@ import com.example.namesplitter.parser.NameParser;
 import com.example.namesplitter.parser.Parser;
 import com.example.namesplitter.helper.StandardizedSalutationGenerator;
 import com.example.namesplitter.storage.InMemoryTitleStorage;
-import com.example.namesplitter.storage.SQLiteNameGenderService;
 import com.example.namesplitter.storage.interfaces.TitleStorageService;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,7 +21,6 @@ public class RESTService implements APIService{
     @Override
     public APIResponse parse(String name) {
         Parser parser = new NameParser();
-        System.out.println(new SQLiteNameGenderService().getGender(name));
         var result = parser.parse(name);
         return new APIResponse(result.getRight().stream().map(excpt -> new ErrorDTO(excpt.getMessage(), excpt.getStartPos(), excpt.getEndPos())).toList(), result.getLeft());
     }
