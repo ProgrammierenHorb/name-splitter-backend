@@ -1,5 +1,6 @@
 package com.example.namesplitter.parser;
 
+import com.example.namesplitter.exception.InvalidCharacterException;
 import com.example.namesplitter.exception.NameSplitterException;
 import com.example.namesplitter.exception.NoLastNameGivenException;
 import com.example.namesplitter.model.Gender;
@@ -43,9 +44,23 @@ public class NameParser implements Parser {
      */
     @Override
     public Pair<StructuredName, List<? extends NameSplitterException>> parse(String input) {
+
         String inputBackup = input;
 
         List<NameSplitterException> errors = new ArrayList<>();
+
+
+
+        String allowedSymbols = "^[a-zA-Z.,\\s-]+$";
+        Pattern pattern = Pattern.compile(allowedSymbols);
+        Matcher matcher = pattern.matcher(input);
+        if(!matcher.matches()) {
+            Matcher invalidCharMatcher = Pattern.compile("[^a-zA-Z.,\\s-]").matcher(input);
+            while (invalidCharMatcher.find()) {
+                errors.add(new InvalidCharacterException(new Position(invalidCharMatcher.start(), invalidCharMatcher.end() - 1)));
+            }
+            return new ImmutablePair<>(new StructuredName(null, null, null, null, null), errors);
+        }
 
         String firstName = "";
         String lastName = "";
@@ -64,7 +79,16 @@ public class NameParser implements Parser {
             input = title.getRight();
         }
 
-        Pair<String, String> name = parseName(input);
+        Pair<String, String> name;
+
+        try{
+           name = parseName(input);
+        }
+        catch(NoLastNameGivenException e){
+            errors.add(e);
+            return new ImmutablePair<>(new StructuredName(null, null, null, null, null), errors);
+        }
+
 
         firstName = name.getLeft();
         lastName = name.getRight();
@@ -152,7 +176,7 @@ public class NameParser implements Parser {
      * @param input The name string to be parsed.
      * @return A Pair object containing a first name string and a last name string.
      */
-    private Pair<String, String> parseName(String input) throws NameSplitterException {
+    private Pair<String, String> parseName(String input) throws NoLastNameGivenException {
 
         input = input.trim();
 
