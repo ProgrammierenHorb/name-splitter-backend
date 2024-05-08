@@ -7,16 +7,21 @@ import com.example.namesplitter.model.CompleteName;
 import com.example.namesplitter.model.Position;
 import com.example.namesplitter.model.ReturnValueAndRemainigString;
 import com.example.namesplitter.storage.InMemoryPatronymicsStorage;
+import com.example.namesplitter.storage.InMemoryTitleStorage;
 import com.example.namesplitter.storage.interfaces.PatronymicsService;
+import com.example.namesplitter.storage.interfaces.TitleStorageService;
 import org.apache.commons.lang3.text.WordUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class NameParser implements ISubParser<CompleteName> {
 
     PatronymicsService patronymicsService = InMemoryPatronymicsStorage.getInstance();
+    TitleStorageService titleStorageService = InMemoryTitleStorage.getInstance();
 
     @Override
     public ReturnValueAndRemainigString<CompleteName> parse(String name) throws NameSplitterException {
@@ -114,37 +119,57 @@ public class NameParser implements ISubParser<CompleteName> {
      * @return A Position object containing the start and end position of the earliest patronymic found.
      */
     private Position getPositionOfPatronyms(String input) {
-        List<String> patronymics = patronymicsService.getAllPatronymics();
-        int earliestLastNameStartIndex = Integer.MAX_VALUE;
-        int earliestLastNameEndIndex = Integer.MAX_VALUE;
-        int lastNameStartIndex;
 
-        //search for patronymics (i.e. "van", "von", "de" etc.) in the input string
-        for (String patronymic : patronymics) {
-            //if the string starts with patronymic, i.e. "van Hoof, Markus" one cannot assume there is a whitespace in front
-            if(input.startsWith(patronymic + " ")){
-                return new Position(0, patronymic.length());
-            }
-            lastNameStartIndex = input.toLowerCase().indexOf(" " + patronymic + " ");
-            //the first patronymic found is taken as the beginning of the last name
-            if (lastNameStartIndex == -1) continue;
-            else{
-                lastNameStartIndex++;
-            }
-            if (lastNameStartIndex < earliestLastNameStartIndex) {
-                earliestLastNameStartIndex = lastNameStartIndex;
-                earliestLastNameEndIndex = lastNameStartIndex + patronymic.length();
-            }
+        String nobilityTitlesRegex = titleStorageService.getAllNobilityTitles().stream().map(title -> title.regex()).reduce("", (a, b) -> a + "|" + b);
+        String patronymicsRegex = patronymicsService.getAllPatronymics().stream().map(patronym -> "\\b" + patronym + "\\b").reduce("", (a, b) -> a + "|" + b);
+        nobilityTitlesRegex = "(" + nobilityTitlesRegex.replaceFirst("\\|", "") + ")\\s?";
+        patronymicsRegex = "(" + patronymicsRegex.replaceFirst("\\|", "") + ")";
 
-            //if two patronymics are found that start at the same position, the longer one is taken
-            //i.e. "van den" ist taken over "van"
-            else if (lastNameStartIndex <= earliestLastNameStartIndex && lastNameStartIndex + patronymic.length() > earliestLastNameEndIndex) {
-                earliestLastNameEndIndex = lastNameStartIndex + patronymic.length();
-            }
+        String regexPattern = "((" + nobilityTitlesRegex + ")?" + patronymicsRegex + ")";
+        //regexPattern = "(((Kaiser|Zar|Kaiserin|Zariza|König|Königin|Erzherzog|Erzherzogin|Großherzog|Großherzogin|Kurfürst|Kurfürstin|Herzog|Herzogin|Landgraf|Landgräfin|Pfalzgraf|Pfalzgräfin|Markgraf|Markgräfin|Fürst|Fürstin|Graf|Gräfin|Freiherr|Baron|Freifrau|Baronin|Baronin)\\s?)?(\\bter\\b|\\bde\\b|\\bquit\\b|\\bvan\\b|\\bvon und zu\\b|\\bden\\b|\\bder\\b|\\bvan den\\b|\\bvon\\b|\\bvom\\b|\\bhet\\b|\\bvan der\\b|\\by\\b|\\bzu\\b|\\bten\\b))";
+
+        Pattern pattern = Pattern.compile(regexPattern, Pattern.CASE_INSENSITIVE);
+        Matcher m = pattern.matcher(input);
+
+        if (m.find()) {
+            int i = m.start();
+            int j = m.end();
+            return new Position(m.start(), m.end());
         }
-        if (earliestLastNameStartIndex == Integer.MAX_VALUE) {
-            return new Position(-1, -1);
-        }
-        return new Position(earliestLastNameStartIndex, earliestLastNameEndIndex);
+
+        return new Position(-1, -1);
+
+//        List<String> patronymics = patronymicsService.getAllPatronymics();
+//        int earliestLastNameStartIndex = Integer.MAX_VALUE;
+//        int earliestLastNameEndIndex = Integer.MAX_VALUE;
+//        int lastNameStartIndex;
+//
+//        //search for patronymics (i.e. "van", "von", "de" etc.) in the input string
+//        for (String patronymic : patronymics) {
+//            //if the string starts with patronymic, i.e. "van Hoof, Markus" one cannot assume there is a whitespace in front
+//            if(input.startsWith(patronymic + " ")){
+//                return new Position(0, patronymic.length());
+//            }
+//            lastNameStartIndex = input.toLowerCase().indexOf(" " + patronymic + " ");
+//            //the first patronymic found is taken as the beginning of the last name
+//            if (lastNameStartIndex == -1) continue;
+//            else{
+//                lastNameStartIndex++;
+//            }
+//            if (lastNameStartIndex < earliestLastNameStartIndex) {
+//                earliestLastNameStartIndex = lastNameStartIndex;
+//                earliestLastNameEndIndex = lastNameStartIndex + patronymic.length();
+//            }
+//
+//            //if two patronymics are found that start at the same position, the longer one is taken
+//            //i.e. "van den" ist taken over "van"
+//            else if (lastNameStartIndex <= earliestLastNameStartIndex && lastNameStartIndex + patronymic.length() > earliestLastNameEndIndex) {
+//                earliestLastNameEndIndex = lastNameStartIndex + patronymic.length();
+//            }
+//        }
+//        if (earliestLastNameStartIndex == Integer.MAX_VALUE) {
+//            return new Position(-1, -1);
+//        }
+//        return new Position(earliestLastNameStartIndex, earliestLastNameEndIndex);
     }
 }

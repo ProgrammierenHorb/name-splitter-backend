@@ -15,7 +15,7 @@ public class InMemoryTitleStorage implements TitleStorageService {
     private static TitleStorageService instance;
 
     public List<TitleData> academicTitles = new ArrayList<>(List.of(
-            new TitleData("Dr[\\.|\\s*]rer[\\.|\\s*]nat[\\.|\\s]?", "Dr.rer.nat.", null, 3),
+            new TitleData("Dr\\.?\\s*rer\\.?\\s*nat[.\\s*|\\s+]", "Dr.rer.nat.", null, 3),
             new TitleData("Dr\\.?\\s*med\\.?\\s", "Dr.med.", null, 3),
             new TitleData("Dr\\.?\\s*phil\\.?\\s", "Dr.phil.", null, 3),
             new TitleData("Dr\\.?\\s*rer\\.?\\s*pol\\.?\\s", "Dr.rer.pol.", null, 3),
@@ -73,6 +73,11 @@ public class InMemoryTitleStorage implements TitleStorageService {
     @Override
     public List<TitleData> getAllAcademicTitles() {
         return List.copyOf(academicTitles);
+    }
+
+    @Override
+    public List<TitleData> getAllNobilityTitles() {
+        return List.copyOf(titleOfNobility);
     }
 
     @Override
