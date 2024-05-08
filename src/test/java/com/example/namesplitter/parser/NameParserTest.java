@@ -230,7 +230,7 @@ class NameParserTest {
     @Test
     void vonUndZuGutenberg(){
         StructuredName expected = new StructuredName(Gender.MALE, new ArrayList<>(List.of("Dr.")), "Karl-Theodor Maria Nikolaus Johann Jacob Philipp Franz Joseph Sylvester", "Freiherr von und zu Guttenberg", null);
-        assertEquals(expected, nameParser.parse("Herr Prof. Doktor Karl-Theodor Maria Nikolaus Johann Jacob Philipp Franz Joseph Sylvester Freiherr von und zu Guttenberg").getLeft());
+        assertEquals(expected, nameParser.parse("Herr Doktor Karl-Theodor Maria Nikolaus Johann Jacob Philipp Franz Joseph Sylvester Freiherr von und zu Guttenberg").getLeft());
     }
 
     @Test

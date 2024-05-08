@@ -81,9 +81,6 @@ public class NameParser implements ISubParser<CompleteName> {
 
         List<Integer> positionOfHyphens = new ArrayList<>();
 
-        //make all patronymics lowercase
-        patronymic = patronymic.toLowerCase();
-
         //remove all hyphens and remember their positions
         for (int i = 0; i < firstName.length(); i++) {
             if (firstName.charAt(i) == '-') {
@@ -126,8 +123,6 @@ public class NameParser implements ISubParser<CompleteName> {
         patronymicsRegex = "(" + patronymicsRegex.replaceFirst("\\|", "") + ")";
 
         String regexPattern = "((" + nobilityTitlesRegex + ")?" + patronymicsRegex + ")";
-        //regexPattern = "(((Kaiser|Zar|Kaiserin|Zariza|König|Königin|Erzherzog|Erzherzogin|Großherzog|Großherzogin|Kurfürst|Kurfürstin|Herzog|Herzogin|Landgraf|Landgräfin|Pfalzgraf|Pfalzgräfin|Markgraf|Markgräfin|Fürst|Fürstin|Graf|Gräfin|Freiherr|Baron|Freifrau|Baronin|Baronin)\\s?)?(\\bter\\b|\\bde\\b|\\bquit\\b|\\bvan\\b|\\bvon und zu\\b|\\bden\\b|\\bder\\b|\\bvan den\\b|\\bvon\\b|\\bvom\\b|\\bhet\\b|\\bvan der\\b|\\by\\b|\\bzu\\b|\\bten\\b))";
-
         Pattern pattern = Pattern.compile(regexPattern, Pattern.CASE_INSENSITIVE);
         Matcher m = pattern.matcher(input);
 
