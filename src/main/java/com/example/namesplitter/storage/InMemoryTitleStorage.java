@@ -90,15 +90,8 @@ public class InMemoryTitleStorage implements TitleStorageService {
     }
 
     @Override
-    public boolean removeTitle(String name) {
-        for (Iterator<TitleData> iterator = academicTitles.iterator(); iterator.hasNext();) {
-            TitleData titleData = iterator.next();
-            if (titleData.name().equals(name)) {
-                iterator.remove();
-                return true;
-            }
-        }
-        return false;
+    public boolean removeTitle(TitleData title) {
+        return academicTitles.remove(title);
     }
 
     public static TitleStorageService getInstance() {

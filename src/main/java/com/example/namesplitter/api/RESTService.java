@@ -23,8 +23,8 @@ public class RESTService implements APIService{
     }
 
     @Override
-    public List<String> getTitles() {
-        return titleStorageService.getAllAcademicTitles().stream().map(TitleData::name).toList();
+    public List<TitleData> getTitles() {
+        return titleStorageService.getAllAcademicTitles();
     }
 
     @Override
@@ -33,7 +33,7 @@ public class RESTService implements APIService{
     }
 
     @Override
-    public boolean removeTitle(String title) {
+    public boolean removeTitle(TitleData title) {
         return titleStorageService.removeTitle(title);
     }
 

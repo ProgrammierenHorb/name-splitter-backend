@@ -10,5 +10,5 @@ public interface TitleStorageService {
     List<TitleData> getAllAcademicTitles();
     List<TitleData> getAllNobilityTitles();
     boolean addTitle(String regex, String title);
-    boolean removeTitle(String title);
+    boolean removeTitle(TitleData title);
 }
