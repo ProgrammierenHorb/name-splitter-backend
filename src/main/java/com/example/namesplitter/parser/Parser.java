@@ -1,5 +1,6 @@
 package com.example.namesplitter.parser;
 
+import com.example.namesplitter.exception.ConflictingGenderException;
 import com.example.namesplitter.exception.InvalidCharacterException;
 import com.example.namesplitter.exception.NameSplitterException;
 import com.example.namesplitter.exception.NoLastNameGivenException;
@@ -41,15 +42,9 @@ public class Parser implements IParser {
 
         List<NameSplitterException> errors = new ArrayList<>();
 
-        //forbid special characters except . , - and whitespace
-        String allowedSymbols = "^[\\p{L}\\p{M}\\p{Z}.,\\s-]+$";
-        Pattern pattern = Pattern.compile(allowedSymbols);
-        Matcher matcher = pattern.matcher(input);
-        if(!matcher.matches()) {
-            Matcher invalidCharMatcher = Pattern.compile("[^\\p{L}\\p{M}\\p{Z}.,\\s-]").matcher(input);
-            while (invalidCharMatcher.find()) {
-                errors.add(new InvalidCharacterException(new Position(invalidCharMatcher.start(), invalidCharMatcher.end() - 1)));
-            }
+        errors.addAll(checkInput(input));
+
+        if(!errors.isEmpty()){
             return new ImmutablePair<>(new StructuredName(null, null, null, null, null), errors);
         }
 
@@ -67,6 +62,14 @@ public class Parser implements IParser {
         ReturnValueAndRemainigString<TitleData> title;
         while ((title = titleParser.parse(input)).returnValue() != null) {
             titles.add(title.returnValue());
+            Gender genderFromTitle = title.returnValue().gender();
+            if(genderFromTitle != null && gender != null && gender != genderFromTitle){
+                errors.add(new ConflictingGenderException(new Position(0, inputBackup.length())));
+                return new ImmutablePair<>(new StructuredName(null, null, null, null, null), errors);
+            }
+            else if(genderFromTitle != null){
+                gender = genderFromTitle;
+            }
             input = title.remainingString();
         }
 
@@ -102,5 +105,22 @@ public class Parser implements IParser {
             }
         }
         return new ImmutablePair<>(new StructuredName(gender, titles.stream().sorted().map(TitleData::name).toList(), firstName, lastName, null), errors);
+    }
+
+    private List<NameSplitterException> checkInput(String input){
+
+        List<NameSplitterException> errors = new ArrayList<>();
+
+        //forbid special characters except . , - and whitespace
+        String allowedSymbols = "^[\\p{L}\\p{M}\\p{Z}.,\\s-]+$";
+        Pattern pattern = Pattern.compile(allowedSymbols);
+        Matcher matcher = pattern.matcher(input);
+        if(!matcher.matches()) {
+            Matcher invalidCharMatcher = Pattern.compile("[^\\p{L}\\p{M}\\p{Z}.,\\s-]").matcher(input);
+            while (invalidCharMatcher.find()) {
+                errors.add(new InvalidCharacterException(new Position(invalidCharMatcher.start(), invalidCharMatcher.end() - 1)));
+            }
+        }
+        return errors;
     }
 }

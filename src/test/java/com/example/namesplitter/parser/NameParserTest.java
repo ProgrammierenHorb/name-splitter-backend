@@ -292,4 +292,5 @@ class NameParserTest {
         StructuredName expected = new StructuredName(Gender.MALE, new ArrayList<>(List.of("Dr.rer.nat.", "Dr.-Ing.", "Dr.h.c.mult.")), "Paul", "Steffens", null);
         assertEquals(expected, nameParser.parse("Herr Dr.-Ing. Dr. rer. nat. Dr. h.c. mult. Paul Steffens").getLeft());
     }
+
 }

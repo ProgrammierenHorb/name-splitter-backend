@@ -11,6 +11,7 @@ import com.example.namesplitter.storage.InMemoryTitleStorage;
 import com.example.namesplitter.storage.interfaces.PatronymicsService;
 import com.example.namesplitter.storage.interfaces.TitleStorageService;
 import org.apache.commons.lang3.text.WordUtils;
+import org.apache.logging.log4j.util.Strings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,12 +27,12 @@ public class NameParser implements ISubParser<CompleteName> {
     @Override
     public ReturnValueAndRemainigString<CompleteName> parse(String name) throws NameSplitterException {
 
-        name = name.trim();
+        name = name.replaceAll(" +", " ").trim();
 
         Position patronymsPos;
-        String lastName;
-        String firstName;
-        String patronymic;
+        String lastName = "";
+        String firstName = "";
+        String patronymic = "";
 
         //if input is empty, return null
         if (name.isEmpty()) {
@@ -55,55 +56,49 @@ public class NameParser implements ISubParser<CompleteName> {
             patronymsPos = getPositionOfPatronyms(parts[0]);
 
             //no patronymic found
-            if(patronymsPos.start() == -1) return new ReturnValueAndRemainigString<>(new CompleteName(firstName.
-                    replaceAll(" +", " "), tempLastName.replaceAll(" +", "-")),
-                    "");
+            if(patronymsPos.start() == -1){
+                lastName = tempLastName;
+            }
+            else{
+                patronymic = parts[0].substring(patronymsPos.start(), patronymsPos.end());
+                lastName = parts[0].substring(patronymsPos.end() + 1);
+            }
 
-            patronymic = parts[0].substring(patronymsPos.start(), patronymsPos.end());
-            lastName = parts[0].substring(patronymsPos.end() + 1);
         }
         else{
             patronymsPos = getPositionOfPatronyms(name);
             //no patronymic found
             if (patronymsPos.start() == -1) {
                 var parts = name.split(" ");
-                if (parts.length == 1) return new ReturnValueAndRemainigString<>(new CompleteName(null, name.trim()), "");
-                return new ReturnValueAndRemainigString<>(new CompleteName(String.join(" ", Arrays.stream(parts).toList().subList(0, parts.length - 1)), parts[parts.length - 1]),
-                        "");
+                //only last name given
+                if (parts.length == 1){
+                    lastName = parts[0];
+                }
+                else {
+                    firstName = String.join(" ", Arrays.stream(parts).toList().subList(0, parts.length - 1));
+                    lastName = parts[parts.length - 1];
+                }
             }
-            patronymic = name.substring(patronymsPos.start(), patronymsPos.end());
-            lastName = name.substring(patronymsPos.end() + 1);
-            firstName = name.substring(0, patronymsPos.start() - 1);
-        }
-
-        lastName = lastName.trim();
-        firstName = firstName.trim();
-
-        List<Integer> positionOfHyphens = new ArrayList<>();
-
-        //remove all hyphens and remember their positions
-        for (int i = 0; i < firstName.length(); i++) {
-            if (firstName.charAt(i) == '-') {
-                firstName = firstName.replace("-", " ");
-                positionOfHyphens.add(i);
+            else{
+                patronymic = name.substring(patronymsPos.start(), patronymsPos.end());
+                lastName = name.substring(patronymsPos.end() + 1);
+                firstName = name.substring(0, patronymsPos.start() - 1);
             }
+
         }
 
-        //prettify name, i.e. KaRl-tHeoDoR GauS is formatted to Karl-Theodor Gaus
-        firstName = WordUtils.capitalize(firstName);
+        lastName = lastName.toLowerCase().trim();
+        firstName = firstName.toLowerCase().trim();
 
-        //reinsert hyphens at their original positions
-        for (int i : positionOfHyphens) {
-            firstName = firstName.substring(0, i) + "-" + firstName.substring(i + 1);
-        }
+        firstName = capitalizeNames(firstName.trim());
 
+        lastName = capitalizeNames(lastName.trim());
         //format double last names with a hyphen
         lastName = lastName.replace(' ', '-');
 
-        if (lastName.isEmpty())
-            throw new NoLastNameGivenException(new Position(patronymsPos.end() + 1, patronymsPos.end() + 1));
+        if (lastName.isEmpty()) throw new NoLastNameGivenException(new Position(patronymsPos.end() + 1, patronymsPos.end() + 1));
         if (firstName.isEmpty()) return new ReturnValueAndRemainigString<>(new CompleteName(null, lastName), "");
-
+        if(patronymic.isEmpty()) return new ReturnValueAndRemainigString<>(new CompleteName(firstName, lastName), "");
         return new ReturnValueAndRemainigString<>(new CompleteName(firstName, patronymic + " " + lastName), "");
     }
 
@@ -166,5 +161,28 @@ public class NameParser implements ISubParser<CompleteName> {
 //            return new Position(-1, -1);
 //        }
 //        return new Position(earliestLastNameStartIndex, earliestLastNameEndIndex);
+    }
+
+    private String capitalizeNames(String input) {
+        String[] words = input.split("(\\s|-)+");
+        StringBuilder result = new StringBuilder();
+
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                result.append(Character.toUpperCase(word.charAt(0)));
+                result.append(word.substring(1).toLowerCase());
+                result.append(' ');
+            }
+        }
+
+        // Trim the trailing space and replace the original hyphens
+        String capitalized = result.toString().trim();
+        for (int i = 0; i < input.length(); i++) {
+            if (input.charAt(i) == '-') {
+                capitalized = capitalized.substring(0, i) + "-" + capitalized.substring(i + 1);
+            }
+        }
+
+        return capitalized;
     }
 }

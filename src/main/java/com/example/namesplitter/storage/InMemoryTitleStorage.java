@@ -66,7 +66,7 @@ public class InMemoryTitleStorage implements TitleStorageService {
             new TitleData("Gräfin", "Gräfin", Gender.FEMALE, Integer.MAX_VALUE),
             new TitleData("Freiherr", "Freiherr", Gender.MALE, Integer.MAX_VALUE),
             new TitleData("Baron", "Baron", Gender.MALE, Integer.MAX_VALUE),
-            new TitleData("Freifrau|Baronin", "Freifrau", Gender.FEMALE, Integer.MAX_VALUE),
+            new TitleData("Freifrau", "Freifrau", Gender.FEMALE, Integer.MAX_VALUE),
             new TitleData("Baronin", "Baronin", Gender.FEMALE, Integer.MAX_VALUE)
     ));
 
