@@ -35,7 +35,7 @@ public interface APIService {
     /**
      * This method adds a new title.
      *
-     * @param titleDTO The title to add.
+     * @param title The title to add.
      * @return A boolean indicating whether the title was successfully added.
      */
     @PostMapping("/addTitle")
