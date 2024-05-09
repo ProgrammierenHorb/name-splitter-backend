@@ -54,8 +54,8 @@ public class RESTService implements APIService{
      * @return A boolean indicating whether the title was successfully added.
      */
     @Override
-    public boolean addTitle(TitleDTO titleDTO) {
-        return titleStorageService.addTitle(titleDTO.name(), titleDTO.regex());
+    public boolean addTitle(TitleData title) {
+        return titleStorageService.addTitle(title);
     }
 
     /**

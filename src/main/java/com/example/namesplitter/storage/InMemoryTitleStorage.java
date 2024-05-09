@@ -1,6 +1,7 @@
 package com.example.namesplitter.storage;
 
 import com.example.namesplitter.model.Gender;
+import com.example.namesplitter.model.TitleDTO;
 import com.example.namesplitter.storage.interfaces.TitleStorageService;
 import com.example.namesplitter.model.TitleData;
 
@@ -81,20 +82,20 @@ public class InMemoryTitleStorage implements TitleStorageService {
     }
 
     @Override
-    public boolean addTitle(String title, String regex) {
+    public boolean addTitle(TitleData title) {
 
         //if the regex is null, the user didn't want to use regex, hence just take the title as the regex and match it exactly
-        if(regex == null){
+        if(title.regex() == null){
             //use exact string matching
-            regex = "\\Q" + title + "\\E";
+            title = new TitleData(title, "\\Q" + title + "\\E");
         }
 
         //if the element is already in the list, return false
-        String finalRegex = regex;
-        if(academicTitles.stream().anyMatch(t -> t.regex().equals(finalRegex) && t.name().equals(title))){
+        TitleData finalTitle = title;
+        if(academicTitles.stream().anyMatch(t -> t.regex().equals(finalTitle.regex()))){
             return false;
         }
-        academicTitles.add(new TitleData(regex, title, null, 100));
+        academicTitles.add(finalTitle);
         return true;
     }
 

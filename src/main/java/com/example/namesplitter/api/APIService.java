@@ -39,7 +39,7 @@ public interface APIService {
      * @return A boolean indicating whether the title was successfully added.
      */
     @PostMapping("/addTitle")
-    public boolean addTitle(@RequestBody TitleDTO titleDTO);
+    public boolean addTitle(@RequestBody TitleData title);
 
     /**
      * This method removes a title.

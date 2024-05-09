@@ -1,6 +1,11 @@
 package com.example.namesplitter.model;
 
 public record TitleData(String regex, String name, Gender gender, int priority) implements Comparable<TitleData> {
+
+    public TitleData(TitleData otherTitle, String regex){
+        this(regex, otherTitle.name(), otherTitle.gender(), otherTitle.priority());
+    }
+
     @Override
     public boolean equals(Object o) {
         if(this == o)

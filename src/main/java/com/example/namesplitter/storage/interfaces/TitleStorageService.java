@@ -9,6 +9,6 @@ public interface TitleStorageService {
 
     List<TitleData> getAllAcademicTitles();
     List<TitleData> getAllNobilityTitles();
-    boolean addTitle(String regex, String title);
+    boolean addTitle(TitleData title);
     boolean removeTitle(TitleData title);
 }
