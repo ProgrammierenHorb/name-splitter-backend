@@ -2,13 +2,14 @@ package com.example.namesplitter.parser;
 
 import com.example.namesplitter.model.Gender;
 import com.example.namesplitter.model.ReturnValueAndRemainigString;
+import com.example.namesplitter.parser.interfaces.ISubParser;
 import com.example.namesplitter.storage.InMemorySalutationService;
 import com.example.namesplitter.storage.interfaces.SalutationStorageService;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class GenderParser implements ISubParser<Gender>{
+public class GenderParser implements ISubParser<Gender> {
 
     private final SalutationStorageService salutationStorage = InMemorySalutationService.getInstance();
 

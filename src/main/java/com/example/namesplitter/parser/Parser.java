@@ -5,6 +5,8 @@ import com.example.namesplitter.exception.InvalidCharacterException;
 import com.example.namesplitter.exception.NameSplitterException;
 import com.example.namesplitter.exception.NoLastNameGivenException;
 import com.example.namesplitter.model.*;
+import com.example.namesplitter.parser.interfaces.IParser;
+import com.example.namesplitter.parser.interfaces.ISubParser;
 import com.example.namesplitter.storage.*;
 import com.example.namesplitter.storage.interfaces.NameGenderService;
 import org.apache.commons.lang3.tuple.ImmutablePair;

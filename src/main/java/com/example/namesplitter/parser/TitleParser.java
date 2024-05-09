@@ -2,13 +2,14 @@ package com.example.namesplitter.parser;
 
 import com.example.namesplitter.model.ReturnValueAndRemainigString;
 import com.example.namesplitter.model.TitleData;
+import com.example.namesplitter.parser.interfaces.ISubParser;
 import com.example.namesplitter.storage.InMemoryTitleStorage;
 import com.example.namesplitter.storage.interfaces.TitleStorageService;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TitleParser implements ISubParser<TitleData>{
+public class TitleParser implements ISubParser<TitleData> {
 
     private final TitleStorageService titleStorage = InMemoryTitleStorage.getInstance();
 

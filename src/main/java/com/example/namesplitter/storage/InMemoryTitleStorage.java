@@ -82,7 +82,6 @@ public class InMemoryTitleStorage implements TitleStorageService {
 
     @Override
     public boolean addTitle(String title, String regex) {
-        System.out.println("Adding title: " + title + " with regex: " + regex);
         //if the element is already in the list, return false
         if(academicTitles.stream().anyMatch(t -> t.regex().equals(regex) && t.name().equals(title))){
             return false;

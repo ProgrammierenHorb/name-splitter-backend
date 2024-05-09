@@ -1,7 +1,7 @@
 package com.example.namesplitter.api;
 
 import com.example.namesplitter.model.*;
-import com.example.namesplitter.parser.IParser;
+import com.example.namesplitter.parser.interfaces.IParser;
 import com.example.namesplitter.parser.Parser;
 import com.example.namesplitter.helper.StandardizedSalutationGenerator;
 import com.example.namesplitter.storage.InMemoryTitleStorage;

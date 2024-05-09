@@ -1,4 +1,4 @@
-package com.example.namesplitter.parser;
+package com.example.namesplitter.parser.interfaces;
 
 import com.example.namesplitter.model.ReturnValueAndRemainigString;
 
