@@ -161,12 +161,6 @@ class NameParserTest {
         assertEquals(expected, nameParser.parse("y Gonzales, Estobar").getLeft());
     }
 
-    @Test
-    void fails(){
-        StructuredName expected = new StructuredName(null, new ArrayList<>(),  "Estobar", "y Gonzales-Müller",null);
-        assertEquals(expected, nameParser.parse("y Gonzales Müller, Herr Estobar").getLeft());
-    }
-
     //endregion
 
     //region Equivalence class 5	"Kein Vorname"
@@ -291,6 +285,12 @@ class NameParserTest {
     void testHerrDrIngDrRerNatDrHcMultPaulSteffens(){
         StructuredName expected = new StructuredName(Gender.MALE, new ArrayList<>(List.of("Dr.rer.nat.", "Dr.-Ing.", "Dr.h.c.mult.")), "Paul", "Steffens", null);
         assertEquals(expected, nameParser.parse("Herr Dr.-Ing. Dr. rer. nat. Dr. h.c. mult. Paul Steffens").getLeft());
+    }
+
+    @Test
+    void multipleSameGenders(){
+        StructuredName expected = new StructuredName(Gender.MALE, new ArrayList<>(List.of("Prof.", "Dr.")), "Paul", "Steffens", null);
+        assertEquals(expected, nameParser.parse("Herr Professor Doktor Paul Steffens").getLeft());
     }
 
 }

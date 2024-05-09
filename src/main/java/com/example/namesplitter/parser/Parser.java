@@ -55,7 +55,15 @@ public class Parser implements IParser {
 
         ReturnValueAndRemainigString<Gender> genderParseResult;
 
-        genderParseResult = genderParser.parse(input);
+        try{
+            genderParseResult = genderParser.parse(input);
+        }
+        catch(NameSplitterException e){
+            //relative position to absolute position
+            errors.add(e);
+            return new ImmutablePair<>(new StructuredName(null, null, null, null, null), errors);
+        }
+
 
         Gender gender = genderParseResult.returnValue();
         input = genderParseResult.remainingString();

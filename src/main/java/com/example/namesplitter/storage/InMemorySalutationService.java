@@ -11,10 +11,10 @@ public class InMemorySalutationService implements SalutationStorageService {
     static InMemorySalutationService instance;
 
     Map<String, Gender> salutations = new HashMap<>(Map.of(
-            "Herr\\s", Gender.MALE,
-            "Frau\\s", Gender.FEMALE,
-            "Mme\\.?\\s", Gender. FEMALE,
-            "Mrs\\.?\\s", Gender.FEMALE
+            "herr", Gender.MALE,
+            "frau", Gender.FEMALE,
+            "mme.", Gender. FEMALE,
+            "mrs.", Gender.FEMALE
     ));
 
     private InMemorySalutationService(){
