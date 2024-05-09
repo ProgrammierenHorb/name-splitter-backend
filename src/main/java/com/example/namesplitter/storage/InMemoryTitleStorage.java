@@ -87,7 +87,7 @@ public class InMemoryTitleStorage implements TitleStorageService {
         //if the regex is null, the user didn't want to use regex, hence just take the title as the regex and match it exactly
         if(title.regex() == null){
             //use exact string matching
-            title = new TitleData(title, "\\Q" + title + "\\E");
+            title = new TitleData(title, "\\Q" + title.name() + "\\E");
         }
 
         //if the element is already in the list, return false
