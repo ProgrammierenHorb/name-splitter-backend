@@ -11,6 +11,7 @@ import java.sql.Statement;
 
 public class SQLiteNameGenderService implements NameGenderService {
 
+    //names db holds the content of the free dataset: https://archive.ics.uci.edu/dataset/591/gender+by+name
     private static final String DB_URL = "jdbc:sqlite::resource:names.db";
 
     @Override
