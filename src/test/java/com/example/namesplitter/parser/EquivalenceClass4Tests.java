@@ -98,4 +98,46 @@ public class EquivalenceClass4Tests {
         assertEquals(expected, nameParser.parse("y Gonzales, Estobar").getLeft());
     }
 
+    @Test
+    void testProfDrDrHCMultJohnDoe() {
+        StructuredName expected = new StructuredName(Gender.MALE, new ArrayList<>(List.of("Prof.", "Dr.", "Dr.h.c.mult.")), "John", "Doe", null);
+        assertEquals(expected, nameParser.parse("Prof. Dr. Dr. h.c. mult. John Doe").getLeft());
+    }
+
+    @Test
+    void testDrIngJaneDoeMSc() {
+        StructuredName expected = new StructuredName(Gender.FEMALE, new ArrayList<>(List.of("Dr.-Ing.", "M.Sc.")), "Jane", "Doe", null);
+        assertEquals(expected, nameParser.parse("Dr.-Ing. M.Sc. Jane Doe").getLeft());
+    }
+
+    @Test
+    void testErzherzogJohannVonHabsburg() {
+        StructuredName expected = new StructuredName(null, new ArrayList<>(), "Erzherzog Johann", "von Habsburg", null);
+        assertEquals(expected, nameParser.parse("Erzherzog Johann von Habsburg").getLeft());
+    }
+
+    @Test
+    void testKaiserinMariaTheresiaVonOsterreich() {
+        StructuredName expected = new StructuredName(null, new ArrayList<>(), "Kaiserin Maria-Theresia", "von Österreich", null);
+        assertEquals(expected, nameParser.parse("Kaiserin Maria-Theresia von Österreich").getLeft());
+    }
+
+    @Test
+    void testDrJohnOReillySmith() {
+        StructuredName expected = new StructuredName(Gender.MALE, new ArrayList<>(List.of("Dr.")), "John", "O'Reilly-Smith", null);
+        assertEquals(expected, nameParser.parse("Dr. John O'Reilly-Smith").getLeft());
+    }
+
+    @Test
+    void testProfDrRerNatJohnDoeSmith() {
+        StructuredName expected = new StructuredName(Gender.MALE, new ArrayList<>(List.of("Prof.", "Dr.rer.nat.")), "John", "Doe-Smith", null);
+        assertEquals(expected, nameParser.parse("Prof. Dr. rer. nat. John Doe-Smith").getLeft());
+    }
+
+    @Test
+    void testDiplInfJaneDoeVonHabsburg() {
+        StructuredName expected = new StructuredName(Gender.FEMALE, new ArrayList<>(List.of("Dipl.-Inf.")), "Jane", "von Habsburg", null);
+        assertEquals(expected, nameParser.parse("Dipl.-Inf. Jane von Habsburg").getLeft());
+    }
+
 }

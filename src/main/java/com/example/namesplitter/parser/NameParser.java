@@ -125,61 +125,26 @@ public class NameParser implements ISubParser<CompleteName> {
         }
 
         return new Position(-1, -1);
-
-//        List<String> patronymics = patronymicsService.getAllPatronymics();
-//        int earliestLastNameStartIndex = Integer.MAX_VALUE;
-//        int earliestLastNameEndIndex = Integer.MAX_VALUE;
-//        int lastNameStartIndex;
-//
-//        //search for patronymics (i.e. "van", "von", "de" etc.) in the input string
-//        for (String patronymic : patronymics) {
-//            //if the string starts with patronymic, i.e. "van Hoof, Markus" one cannot assume there is a whitespace in front
-//            if(input.startsWith(patronymic + " ")){
-//                return new Position(0, patronymic.length());
-//            }
-//            lastNameStartIndex = input.toLowerCase().indexOf(" " + patronymic + " ");
-//            //the first patronymic found is taken as the beginning of the last name
-//            if (lastNameStartIndex == -1) continue;
-//            else{
-//                lastNameStartIndex++;
-//            }
-//            if (lastNameStartIndex < earliestLastNameStartIndex) {
-//                earliestLastNameStartIndex = lastNameStartIndex;
-//                earliestLastNameEndIndex = lastNameStartIndex + patronymic.length();
-//            }
-//
-//            //if two patronymics are found that start at the same position, the longer one is taken
-//            //i.e. "van den" ist taken over "van"
-//            else if (lastNameStartIndex <= earliestLastNameStartIndex && lastNameStartIndex + patronymic.length() > earliestLastNameEndIndex) {
-//                earliestLastNameEndIndex = lastNameStartIndex + patronymic.length();
-//            }
-//        }
-//        if (earliestLastNameStartIndex == Integer.MAX_VALUE) {
-//            return new Position(-1, -1);
-//        }
-//        return new Position(earliestLastNameStartIndex, earliestLastNameEndIndex);
     }
 
     private String capitalizeNames(String input) {
-        String[] words = input.split("(\\s|-)+");
+        String[] words = input.split("(\\s|-|')+");
         StringBuilder result = new StringBuilder();
 
         for (String word : words) {
             if (!word.isEmpty()) {
                 result.append(Character.toUpperCase(word.charAt(0)));
-                result.append(word.substring(1).toLowerCase());
-                result.append(' ');
+                result.append(word.substring(1));
             }
         }
 
-        // Trim the trailing space and replace the original hyphens
-        String capitalized = result.toString().trim();
+        // Replace the original hyphens, apostrophes and whitespaces
         for (int i = 0; i < input.length(); i++) {
-            if (input.charAt(i) == '-') {
-                capitalized = capitalized.substring(0, i) + "-" + capitalized.substring(i + 1);
+            if (input.charAt(i) == '-' || input.charAt(i) == '\'' || input.charAt(i) == ' ') {
+                result.insert(i, input.charAt(i));
             }
         }
 
-        return capitalized;
+        return result.toString();
     }
 }

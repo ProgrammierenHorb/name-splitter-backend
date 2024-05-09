@@ -122,11 +122,11 @@ public class Parser implements IParser {
         List<NameSplitterException> errors = new ArrayList<>();
 
         //forbid special characters except . , - and whitespace
-        String allowedSymbols = "^[\\p{L}\\p{M}\\p{Z}.,\\s-]+$";
+        String allowedSymbols = "^[\\p{L}\\p{M}\\p{Z}.,\\s-']+$";
         Pattern pattern = Pattern.compile(allowedSymbols);
         Matcher matcher = pattern.matcher(input);
         if(!matcher.matches()) {
-            Matcher invalidCharMatcher = Pattern.compile("[^\\p{L}\\p{M}\\p{Z}.,\\s-]").matcher(input);
+            Matcher invalidCharMatcher = Pattern.compile("[^\\p{L}\\p{M}\\p{Z}.,\\s-']").matcher(input);
             while (invalidCharMatcher.find()) {
                 errors.add(new InvalidCharacterException(new Position(invalidCharMatcher.start(), invalidCharMatcher.end() - 1)));
             }
