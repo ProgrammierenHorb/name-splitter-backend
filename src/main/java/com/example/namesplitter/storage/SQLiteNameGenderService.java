@@ -20,6 +20,7 @@ public class SQLiteNameGenderService implements NameGenderService {
         try (Connection conn = DriverManager.getConnection(DB_URL);
              Statement stmt = conn.createStatement()) {
 
+            //TODO: this is probably vulnerable to SQL injection
             String query = "SELECT Gender FROM names WHERE Name = '" + name + "'";
             ResultSet rs = stmt.executeQuery(query);
 

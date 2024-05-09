@@ -82,8 +82,16 @@ public class InMemoryTitleStorage implements TitleStorageService {
 
     @Override
     public boolean addTitle(String title, String regex) {
+
+        //if the regex is null, the user didn't want to use regex, hence just take the title as the regex and match it exactly
+        if(regex == null){
+            //use exact string matching
+            regex = "\\Q" + title + "\\E";
+        }
+
         //if the element is already in the list, return false
-        if(academicTitles.stream().anyMatch(t -> t.regex().equals(regex) && t.name().equals(title))){
+        String finalRegex = regex;
+        if(academicTitles.stream().anyMatch(t -> t.regex().equals(finalRegex) && t.name().equals(title))){
             return false;
         }
         academicTitles.add(new TitleData(regex, title, null, 100));
