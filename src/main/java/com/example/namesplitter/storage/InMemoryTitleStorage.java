@@ -72,12 +72,12 @@ public class InMemoryTitleStorage implements TitleStorageService {
 
     @Override
     public List<TitleData> getAllAcademicTitles() {
-        return List.copyOf(academicTitles);
+        return academicTitles;
     }
 
     @Override
     public List<TitleData> getAllNobilityTitles() {
-        return List.copyOf(titleOfNobility);
+        return titleOfNobility;
     }
 
     @Override
@@ -96,6 +96,6 @@ public class InMemoryTitleStorage implements TitleStorageService {
     }
 
     public static TitleStorageService getInstance() {
-        return instance == null ? new InMemoryTitleStorage() : instance;
+        return instance == null ? instance = new InMemoryTitleStorage() : instance;
     }
 }

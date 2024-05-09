@@ -44,21 +44,6 @@ class RESTServiceTest {
         assertEquals(new TitleData("TitleDTO", "Regex", null, 100), titles.getFirst());
     }
 
-//    @Test
-//    void testAddTitle() {
-//        TitleDTO titleDTO = new TitleDTO("TitleDTO", "Regex");
-//        assertTrue(restService.addTitle(titleDTO));
-//        // Verify that titleDTO is added to the titleDTO storage service
-//        verify(titleStorageService, times(1)).addTitle("TitleDTO", "Regex");
-//    }
-
-//    @Test
-//    void testSave() {
-//        StructuredName name = new StructuredName(Gender.MALE, List.of("Dr."), "Jon","Doe",null);
-//        StructuredName savedName = restService.save(name);
-//        //TODO: assert if saved successful
-//    }
-
     @Test
     void testStatus() {
         assertEquals("online", restService.status());
