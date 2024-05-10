@@ -2,7 +2,6 @@ package com.example.namesplitter.api;
 
 import com.example.namesplitter.model.APIResponse;
 import com.example.namesplitter.model.StructuredName;
-import com.example.namesplitter.model.TitleDTO;
 import com.example.namesplitter.model.TitleData;
 import org.springframework.web.bind.annotation.*;
 

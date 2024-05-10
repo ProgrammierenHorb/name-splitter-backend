@@ -1,7 +1,6 @@
 package com.example.namesplitter.storage;
 
 import com.example.namesplitter.model.Gender;
-import com.example.namesplitter.model.TitleDTO;
 import com.example.namesplitter.storage.interfaces.TitleStorageService;
 import com.example.namesplitter.model.TitleData;
 
