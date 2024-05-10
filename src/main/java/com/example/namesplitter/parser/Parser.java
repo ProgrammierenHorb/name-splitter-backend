@@ -15,7 +15,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
-/**🐒🐒🐒🐒
+/**
  * The Parser class implements the IParser interface and provides methods to parse a name string into a structured name.
  * It uses services to retrieve titles, salutations, genders, and patronymics.
  * The parse method is the main method that orchestrates the parsing process.
