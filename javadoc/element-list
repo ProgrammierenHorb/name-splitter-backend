@@ -1,0 +1,9 @@
+com.example.namesplitter
+com.example.namesplitter.api
+com.example.namesplitter.exception
+com.example.namesplitter.helper
+com.example.namesplitter.model
+com.example.namesplitter.parser
+com.example.namesplitter.parser.interfaces
+com.example.namesplitter.storage
+com.example.namesplitter.storage.interfaces
