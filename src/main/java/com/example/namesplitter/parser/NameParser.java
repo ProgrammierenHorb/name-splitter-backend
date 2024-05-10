@@ -16,11 +16,23 @@ import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * The NameParser class implements the ISubParser interface and provides methods to parse a name string into a CompleteName object.
+ * It uses services provided by InMemoryPatronymicsStorage and InMemoryTitleStorage to handle patronymics and titles.
+ */
 public class NameParser implements ISubParser<CompleteName> {
 
     PatronymicsService patronymicsService = InMemoryPatronymicsStorage.getInstance();
     TitleStorageService titleStorageService = InMemoryTitleStorage.getInstance();
 
+    /**
+     * The parse method takes a name string as input and parses it into a CompleteName object.
+     * It throws a NameSplitterException if the input string is invalid or cannot be parsed.
+     *
+     * @param name The name string to be parsed.
+     * @return A ReturnValueAndRemainigString object containing the parsed CompleteName object and the remaining string after parsing.
+     * @throws NameSplitterException If the input string is invalid or cannot be parsed.
+     */
     @Override
     public ReturnValueAndRemainigString<CompleteName> parse(String name) throws NameSplitterException {
 
@@ -127,6 +139,13 @@ public class NameParser implements ISubParser<CompleteName> {
         return new Position(-1, -1);
     }
 
+    /**
+     * The capitalizeNames method takes an input string and capitalizes the first letter of each word in it.
+     * It handles words separated by spaces, hyphens, and apostrophes.
+     *
+     * @param input The input string to be capitalized.
+     * @return The capitalized string.
+     */
     private String capitalizeNames(String input) {
         String[] words = input.split("(\\s|-|')+");
         StringBuilder result = new StringBuilder();

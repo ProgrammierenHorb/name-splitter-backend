@@ -117,6 +117,13 @@ public class Parser implements IParser {
         return new ImmutablePair<>(new StructuredName(gender, titles.stream().sorted().map(TitleData::name).toList(), firstName, lastName, null), errors);
     }
 
+    /**
+     * The checkInput method checks the input string for invalid characters.
+     * It returns a list of errors if any invalid characters are found.
+     *
+     * @param input The input string to be checked.
+     * @return A list of errors if any invalid characters are found.
+     */
     private List<NameSplitterException> checkInput(String input){
 
         List<NameSplitterException> errors = new ArrayList<>();

@@ -50,7 +50,7 @@ public class RESTService implements APIService{
     /**
      * This method adds a new title to the title storage.
      *
-     * @param titleDTO The title to add.
+     * @param title The title to add.
      * @return A boolean indicating whether the title was successfully added.
      */
     @Override

@@ -9,6 +9,10 @@ import com.example.namesplitter.storage.interfaces.TitleStorageService;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * The TitleParser class implements the ISubParser interface and provides methods to parse a title from an input string.
+ * It uses a TitleStorageService to retrieve a list of academic titles and their corresponding regex patterns.
+ */
 public class TitleParser implements ISubParser<TitleData> {
 
     private final TitleStorageService titleStorage = InMemoryTitleStorage.getInstance();

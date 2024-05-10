@@ -7,14 +7,29 @@ import com.example.namesplitter.model.TitleData;
 
 import java.util.*;
 
+/**
+ * The InMemoryTitleStorage class implements the TitleStorageService interface and provides an in-memory storage for titles.
+ * It uses ArrayLists to store academic titles and titles of nobility.
+ * It follows the Singleton design pattern to ensure that only one instance of this class is created.
+ */
 public class InMemoryTitleStorage implements TitleStorageService {
 
+    /**
+     * Private constructor to prevent instantiation of this class directly.
+     * It calls the super constructor implicitly.
+     */
     private InMemoryTitleStorage(){
         super();
     }
 
+    /**
+     * A static instance of this class. It is used to implement the Singleton design pattern.
+     */
     private static TitleStorageService instance;
 
+    /**
+     * An ArrayList to store the academic titles. It is initialized with a list of predefined academic titles.
+     */
     public List<TitleData> academicTitles = new ArrayList<>(List.of(
             new TitleData("Prof\\.?\\s", "Prof.", null, 10),
             new TitleData("Professor\\s?", "Prof.", Gender.MALE, 10),
@@ -41,7 +56,10 @@ public class InMemoryTitleStorage implements TitleStorageService {
             new TitleData("B\\.?\\s*Eng\\.?\\s", "B.Eng.", null, 190)
     ));
 
-    //https://de.wikipedia.org/wiki/Adelstitel
+    /**
+     * An ArrayList to store the titles of nobility. It is initialized with a list of predefined titles of nobility.
+     * The titles are taken from <a href="https://de.wikipedia.org/wiki/Adelstitel">this wikipedia entry</a>
+     */
     public List<TitleData> titleOfNobility = new ArrayList<>(List.of(
             new TitleData("Kaiser|Zar", "Kaiser", Gender.MALE, Integer.MAX_VALUE),
             new TitleData("Kaiserin|Zariza", "Kaiserin", Gender.FEMALE, Integer.MAX_VALUE),
@@ -71,16 +89,36 @@ public class InMemoryTitleStorage implements TitleStorageService {
             new TitleData("Baronin", "Baronin", Gender.FEMALE, Integer.MAX_VALUE)
     ));
 
+    /**
+     * This method returns a list of all academic titles stored in the ArrayList.
+     * It overrides the getAllAcademicTitles method of the TitleStorageService interface.
+     *
+     * @return A list of all academic titles.
+     */
     @Override
     public List<TitleData> getAllAcademicTitles() {
         return academicTitles;
     }
 
+    /**
+     * This method returns a list of all titles of nobility stored in the ArrayList.
+     * It overrides the getAllNobilityTitles method of the TitleStorageService interface.
+     *
+     * @return A list of all titles of nobility.
+     */
     @Override
     public List<TitleData> getAllNobilityTitles() {
         return titleOfNobility;
     }
 
+    /**
+     * This method adds a new title to the list of academic titles.
+     * It checks if the title is already in the list before adding it.
+     * It overrides the addTitle method of the TitleStorageService interface.
+     *
+     * @param title The title to be added.
+     * @return A boolean indicating whether the title was added successfully.
+     */
     @Override
     public boolean addTitle(TitleData title) {
 
@@ -99,11 +137,25 @@ public class InMemoryTitleStorage implements TitleStorageService {
         return true;
     }
 
+    /**
+     * This method removes a title from the list of academic titles.
+     * It overrides the removeTitle method of the TitleStorageService interface.
+     *
+     * @param title The title to be removed.
+     * @return A boolean indicating whether the title was removed successfully.
+     */
     @Override
     public boolean removeTitle(TitleData title) {
         return academicTitles.remove(title);
     }
 
+    /**
+     * This method returns the single instance of this class.
+     * If the instance is null, it creates a new instance of this class and returns it.
+     * Otherwise, it returns the existing instance.
+     *
+     * @return The single instance of this class.
+     */
     public static TitleStorageService getInstance() {
         return instance == null ? instance = new InMemoryTitleStorage() : instance;
     }
