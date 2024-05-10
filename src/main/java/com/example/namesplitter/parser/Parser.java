@@ -4,6 +4,7 @@ import com.example.namesplitter.exception.ConflictingGenderException;
 import com.example.namesplitter.exception.InvalidCharacterException;
 import com.example.namesplitter.exception.NameSplitterException;
 import com.example.namesplitter.exception.NoLastNameGivenException;
+import com.example.namesplitter.helper.GlobalVariables;
 import com.example.namesplitter.model.*;
 import com.example.namesplitter.parser.interfaces.IParser;
 import com.example.namesplitter.parser.interfaces.ISubParser;
@@ -43,12 +44,6 @@ public class Parser implements IParser {
         String inputBackup = input;
 
         List<NameSplitterException> errors = new ArrayList<>();
-
-        errors.addAll(checkInput(input));
-
-        if(!errors.isEmpty()){
-            return new ImmutablePair<>(new StructuredName(null, null, null, null, null), errors);
-        }
 
         String firstName;
         String lastName;
@@ -117,27 +112,4 @@ public class Parser implements IParser {
         return new ImmutablePair<>(new StructuredName(gender, titles.stream().sorted().map(TitleData::name).toList(), firstName, lastName, null), errors);
     }
 
-    /**
-     * The checkInput method checks the input string for invalid characters.
-     * It returns a list of errors if any invalid characters are found.
-     *
-     * @param input The input string to be checked.
-     * @return A list of errors if any invalid characters are found.
-     */
-    private List<NameSplitterException> checkInput(String input){
-
-        List<NameSplitterException> errors = new ArrayList<>();
-
-        //forbid special characters except . , - and whitespace
-        String allowedSymbols = "^[\\p{L}\\p{M}\\p{Z}.,\\s-']+$";
-        Pattern pattern = Pattern.compile(allowedSymbols);
-        Matcher matcher = pattern.matcher(input);
-        if(!matcher.matches()) {
-            Matcher invalidCharMatcher = Pattern.compile("[^\\p{L}\\p{M}\\p{Z}.,\\s-']").matcher(input);
-            while (invalidCharMatcher.find()) {
-                errors.add(new InvalidCharacterException(new Position(invalidCharMatcher.start(), invalidCharMatcher.end() - 1)));
-            }
-        }
-        return errors;
-    }
 }

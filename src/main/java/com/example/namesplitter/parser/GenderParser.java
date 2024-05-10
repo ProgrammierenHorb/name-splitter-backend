@@ -43,7 +43,7 @@ public class GenderParser implements ISubParser<Gender> {
         //Gender needs to be at the beginning of the string
         //if string contains a gender but not at the beginning throw exception
         String regexPattern = salutationStorage.getAllSalutations().keySet().stream()
-                .map(g -> "\\b" + Pattern.quote(g) + "(\\W|$)")
+                .map(g -> "\\b" + Pattern.quote(g) + "(\\p{Z}|$)")
                 .reduce("", (a, b) -> a + "|" + b);
 
         String regexPatternValidSalutation = "^(" + regexPattern.replaceFirst("\\|", "") + ")";

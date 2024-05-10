@@ -3,6 +3,7 @@ package com.example.namesplitter.parser;
 import com.example.namesplitter.exception.InvalidCharacterException;
 import com.example.namesplitter.exception.NameSplitterException;
 import com.example.namesplitter.exception.NoLastNameGivenException;
+import com.example.namesplitter.helper.GlobalVariables;
 import com.example.namesplitter.model.CompleteName;
 import com.example.namesplitter.model.Position;
 import com.example.namesplitter.model.ReturnValueAndRemainigString;
@@ -12,7 +13,9 @@ import com.example.namesplitter.storage.InMemoryTitleStorage;
 import com.example.namesplitter.storage.interfaces.PatronymicsService;
 import com.example.namesplitter.storage.interfaces.TitleStorageService;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,6 +38,8 @@ public class NameParser implements ISubParser<CompleteName> {
      */
     @Override
     public ReturnValueAndRemainigString<CompleteName> parse(String name) throws NameSplitterException {
+
+        checkInput(name);
 
         name = name.replaceAll(" +", " ").trim();
 
@@ -165,5 +170,25 @@ public class NameParser implements ISubParser<CompleteName> {
         }
 
         return result.toString();
+    }
+
+    /**
+     * This method checks the input string for any disallowed characters.
+     *
+     * @param input The input string to be checked.
+     * @throws InvalidCharacterException If the input string contains any disallowed characters.
+     */
+    private void checkInput(String input) throws InvalidCharacterException{
+
+        //forbid most special characters
+        String allowedSymbols = GlobalVariables.allowedCharacters;
+        Pattern pattern = Pattern.compile(allowedSymbols);
+        Matcher matcher = pattern.matcher(input);
+        if(!matcher.matches()) {
+            Matcher invalidCharMatcher = Pattern.compile(GlobalVariables.disallowedCharacters).matcher(input);
+            if(invalidCharMatcher.find()){
+                throw new InvalidCharacterException(new Position(invalidCharMatcher.start(), invalidCharMatcher.end() - 1));
+            }
+        }
     }
 }
