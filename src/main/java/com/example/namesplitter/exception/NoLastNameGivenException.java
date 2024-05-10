@@ -7,6 +7,6 @@ import com.example.namesplitter.model.Position;
  */
 public class NoLastNameGivenException extends NameSplitterException{
     public NoLastNameGivenException(Position loc) {
-        super("Please provide at least a last name", loc);
+        super("Bitte geben Sie einen Nachnamen an", loc);
     }
 }
